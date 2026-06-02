@@ -9,6 +9,7 @@ required_files=(
   "GEMINI.md"
   ".github/copilot-instructions.md"
   ".harness/workflow.md"
+  ".harness/github-targets.json"
   ".agents/roles/product_manager.md"
   ".agents/roles/orchestrator.md"
   ".agents/roles/architect.md"
@@ -25,6 +26,11 @@ required_files=(
   ".memory/last-evaluation.json"
   ".stitch/DESIGN.md"
   ".stitch/SITE.md"
+  ".stitch/next-prompt.md"
+  ".github/prompts/refine.prompt.md"
+  ".github/prompts/intent.prompt.md"
+  ".github/agents/harness.refine.agent.md"
+  ".github/agents/harness.intent.agent.md"
 )
 
 for file in "${required_files[@]}"; do
@@ -103,6 +109,82 @@ fi
 
 if ! jq -e '.mcpServers.stitch.type == "http" and .mcpServers.stitch.url == "https://stitch.googleapis.com/mcp" and (.mcpServers.stitch.headers["X-Goog-Api-Key"] | length > 0)' .mcp.example.json >/dev/null; then
   echo "MCP Stitch HTTP ausente ou mal configurado em .mcp.example.json."
+  exit 1
+fi
+
+if ! jq -e '
+  .productRepository == "italomanzine/Alexandria-UFSC" and
+  .harnessRepository == "italomanzine/Harness-Engineering" and
+  .projectUrl == "https://github.com/users/italomanzine/projects/3/views/1" and
+  .defaultStitchProjectUrl == "https://stitch.withgoogle.com/projects/13111711788255953460?pli=1" and
+  .stitchProjectName == "projects/13111711788255953460" and
+  .kanban.statusField == "Status" and
+  .kanban.statuses.backlog == "Backlog" and
+  .kanban.statuses.ready == "Ready" and
+  .kanban.statuses.inProgress == "In progress" and
+  .kanban.statuses.inReview == "In review"
+' .harness/github-targets.json >/dev/null; then
+  echo "Targets GitHub/Kanban/Stitch ausentes ou incorretos em .harness/github-targets.json."
+  exit 1
+fi
+
+if grep -R "Create product Issues/User Stories only in italomanzine/Harness-Engineering" .harness/github-targets.json >/dev/null; then
+  echo "Regra invalida: productRepository nao pode apontar para o repo do harness."
+  exit 1
+fi
+
+if ! grep -R "italomanzine/Alexandria-UFSC" AGENTS.md README.md GEMINI.md .github/copilot-instructions.md .harness/workflow.md .agents/roles .github/prompts >/dev/null; then
+  echo "Repositorio de produto italomanzine/Alexandria-UFSC nao encontrado nos contratos principais."
+  exit 1
+fi
+
+if ! grep -R "https://github.com/users/italomanzine/projects/3/views/1" AGENTS.md README.md GEMINI.md .github/copilot-instructions.md .harness/workflow.md .agents/roles .github/prompts >/dev/null; then
+  echo "GitHub Project 3 nao encontrado nos contratos principais."
+  exit 1
+fi
+
+if ! grep -R "Status=Backlog\|Initial status: Backlog" AGENTS.md README.md .harness/workflow.md .agents/roles .github/prompts >/dev/null; then
+  echo "Regra de Backlog para /refine nao encontrada."
+  exit 1
+fi
+
+if ! grep -R 'Status=Ready\|only `/intent` cards in Ready\|card.*Ready' AGENTS.md README.md .harness/workflow.md .agents/roles .github/prompts >/dev/null; then
+  echo "Ready gate de /intent nao encontrado."
+  exit 1
+fi
+
+if ! grep -R "In progress" AGENTS.md README.md GEMINI.md .harness/workflow.md .agents/roles .github/prompts >/dev/null; then
+  echo "Transicao Kanban para In progress nao encontrada."
+  exit 1
+fi
+
+if ! grep -R "In review" AGENTS.md README.md GEMINI.md .harness/workflow.md .agents/roles .github/prompts >/dev/null; then
+  echo "Transicao Kanban para In review nao encontrada."
+  exit 1
+fi
+
+if ! grep -R "https://stitch.withgoogle.com/projects/13111711788255953460?pli=1" AGENTS.md README.md GEMINI.md .github/copilot-instructions.md .harness/workflow.md .agents/roles .github/prompts .stitch >/dev/null; then
+  echo "URL real do prototipo Stitch nao encontrada nos contratos principais."
+  exit 1
+fi
+
+if ! grep -R "projects/13111711788255953460" AGENTS.md README.md GEMINI.md .github/copilot-instructions.md .harness/workflow.md .agents/roles .github/prompts .stitch >/dev/null; then
+  echo "Resource MCP real do Stitch nao encontrado nos contratos principais."
+  exit 1
+fi
+
+if ! grep -q "Alexandria — High-End Editorial" .stitch/DESIGN.md; then
+  echo ".stitch/DESIGN.md nao contem o design real do prototipo."
+  exit 1
+fi
+
+if ! grep -q "Calculadora de Notas UFSC" .stitch/SITE.md; then
+  echo ".stitch/SITE.md nao contem metadados reais do prototipo."
+  exit 1
+fi
+
+if ! grep -q "^---" .github/prompts/refine.prompt.md || ! grep -q "^---" .github/prompts/intent.prompt.md; then
+  echo "Prompts /refine ou /intent sem frontmatter."
   exit 1
 fi
 

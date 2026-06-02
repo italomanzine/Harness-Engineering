@@ -1,0 +1,61 @@
+{
+  "featureDir": "specs/calculadora-sobrevivencia-academica",
+  "branch": "feature/calculadora-sobrevivencia-academica",
+  "scope": [
+    "Implementar tela inicial da Calculadora de Sobrevivencia Academica no repo Alexandria-UFSC",
+    "Criar monorepo npm com app Next.js em apps/web",
+    "Cobrir calculo de media, proxima nota, frequencia e REC com testes automatizados",
+    "Gerar evidencia visual desktop e mobile com Playwright"
+  ],
+  "requirements": [
+    "FR-001",
+    "FR-002",
+    "FR-003",
+    "FR-004",
+    "FR-005",
+    "FR-006",
+    "FR-007",
+    "FR-008",
+    "FR-009",
+    "FR-010",
+    "FR-011",
+    "FR-012",
+    "FR-013",
+    "FR-014",
+    "FR-015",
+    "FR-016",
+    "FR-017",
+    "FR-018",
+    "FR-019",
+    "FR-020",
+    "FR-021",
+    "FR-022",
+    "FR-023",
+    "FR-024",
+    "FR-025"
+  ],
+  "bddScenarios": [
+    "SCN-001 Estrutura principal visivel",
+    "SCN-002 Calculo de nota necessaria na proxima avaliacao",
+    "SCN-003 Frequencia menor que 75 destaca insuficiencia",
+    "SCN-004 Media entre 3.0 e 5.5 indica REC potencial",
+    "SCN-005 Nota REC calcula media final",
+    "SCN-006 Media 5.75 explica arredondamento para 6.0",
+    "SCN-007 Links futuros visiveis em desktop e mobile",
+    "SCN-008 Ordem de foco e estados de foco perceptiveis"
+  ],
+  "checks": [
+    "harness",
+    "lint",
+    "typecheck",
+    "build",
+    "unit",
+    "e2e"
+  ],
+  "visualEvidenceRequired": true,
+  "visualEvidence": [
+    "Alexandria-UFSC/output/playwright/calculadora-desktop.png",
+    "Alexandria-UFSC/output/playwright/calculadora-mobile.png"
+  ],
+  "maxCycles": 2
+}

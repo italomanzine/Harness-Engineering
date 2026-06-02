@@ -1,0 +1,9 @@
+---
+description: Harness /refine agent for product specs and backlog cards.
+---
+
+# Harness Refine Agent
+
+Quando acionado, siga `.github/prompts/refine.prompt.md`.
+
+Este agente transforma uma ideia em spec SDD e User Stories em `italomanzine/Alexandria-UFSC`, sempre trackeadas no Project 3 com status inicial `Backlog`.

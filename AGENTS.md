@@ -1,21 +1,25 @@
-# Harness Engineering Demo
+# Harness Engineering
 
-Este repositório é um exemplo didático de Harness Engineering para agentes de IA no desenvolvimento de software.
+Este repositório define um harness operacional para agentes de IA no desenvolvimento de software.
 
 ## Regra de Ouro
 
 Nunca desenvolva direto na `main` ou `master`.
 
 Todo fluxo `/intent` deve:
-1. Ler a User Story no GitHub Project/Issue.
-2. Ler `specs/<slug>/spec.md`.
-3. Criar `specs/<slug>/plan.md`, `specs/<slug>/tasks.md` e `specs/<slug>/evaluation-contract.json`.
-4. Atualizar a base local a partir da `main`.
-5. Criar uma branch `feature/<slug-da-us>`.
-6. Implementar no máximo 1 User Story ou 5 tasks por ciclo com TDD.
-7. Declarar `ready_for_evaluation`.
-8. Rodar `scripts/evaluate.sh <feature-dir>`.
-9. Abrir PR para `main` usando GitHub MCP somente se a avaliação retornar `0`.
+1. Ler `.harness/github-targets.json`.
+2. Ler a User Story no GitHub Project/Issue do repo `italomanzine/Alexandria-UFSC`.
+3. Confirmar que o card está no Project 3 com `Status=Ready`.
+4. Mover o card para `In progress`.
+5. Ler `specs/<slug>/spec.md`.
+6. Criar `specs/<slug>/plan.md`, `specs/<slug>/tasks.md` e `specs/<slug>/evaluation-contract.json`.
+7. Atualizar a base local a partir da `main`.
+8. Criar uma branch `feature/<slug-da-us>` no repo de produto.
+9. Implementar no máximo 1 User Story ou 5 tasks por ciclo com TDD.
+10. Declarar `ready_for_evaluation`.
+11. Rodar `scripts/evaluate.sh <feature-dir>`.
+12. Abrir PR para `main` em `italomanzine/Alexandria-UFSC` usando GitHub MCP somente se a avaliação retornar `0`.
+13. Mover o card para `In review` para validação humana.
 
 ## Backbone SDD
 
@@ -43,6 +47,7 @@ O harness deve usar somente estas fontes para operar:
 - `.github/copilot-instructions.md`
 - `GEMINI.md`
 - `.harness/workflow.md`
+- `.harness/github-targets.json`
 - `.harness/browser-validation.md`
 - `.agents/roles/`
 - `.agents/skills/`
@@ -53,7 +58,7 @@ O harness deve usar somente estas fontes para operar:
 - `scripts/evaluate.sh`
 - `scripts/bootstrap-context.sh`
 
-A pasta `docs/` é apenas material de exemplo e inspiração para a palestra. Não use arquivos de `docs/` como dependência direta de `/refine`, `/intent`, revisão, validação ou PR.
+A pasta `docs/` é apenas material de exemplo e inspiração. Não use arquivos de `docs/` como dependência direta de `/refine`, `/intent`, revisão, validação ou PR.
 
 ## Fluxos Principais
 
@@ -65,8 +70,11 @@ Objetivo:
 - Refinar uma ideia de feature com abordagem Spec Driven Development.
 - Criar uma spec Markdown em `specs/<slug>/spec.md`.
 - Escrever critérios BDD em `Dado / Quando / Então`.
-- Criar ou atualizar cards de User Story no GitHub Project via GitHub MCP.
+- Criar ou atualizar Issues/User Stories em `italomanzine/Alexandria-UFSC` via GitHub MCP.
+- Trackear cards no Project `https://github.com/users/italomanzine/projects/3/views/1`.
+- Definir cards novos com `Status=Backlog`.
 - Registrar critérios de aceite, design esperado, dependências e riscos.
+- Incluir link Stitch, resource MCP e diretrizes UI/UX no card quando houver interface.
 
 ### `/intent`
 
@@ -74,12 +82,15 @@ Use o agente [Orchestrator](.agents/roles/orchestrator.md).
 
 Objetivo:
 - Pegar uma US do GitHub Project/Issue.
+- Só iniciar se a US estiver com `Status=Ready`.
+- Mover a US para `In progress` ao iniciar.
 - Ler a spec correspondente em `specs/<slug>/spec.md`.
 - Criar/validar `plan.md` e `tasks.md`.
 - Criar branch `feature/<slug>`.
 - Delegar plano técnico ao Architect e implementação ao Coder.
 - Implementar com TDD, validar com Evaluator, revisar com Reviewer e abrir PR.
 - Anexar evidências visuais na discussão do PR quando houver UI.
+- Mover a US para `In review` após PR aberto.
 
 ## Agentes
 
@@ -130,6 +141,8 @@ Se os comandos de sensores não fizerem sentido no projeto de destino, adapte `.
 ## UI/UX
 
 Para qualquer mudança visual ou interativa, use `.agents/skills/ui-ux-pro-max/SKILL.md` junto com Stitch.
+
+Use o protótipo `https://stitch.withgoogle.com/projects/13111711788255953460?pli=1`, resource MCP `projects/13111711788255953460` e `.stitch/DESIGN.md` como fonte visual operacional real.
 
 Use `.agents/skills/playwright/SKILL.md` como ferramenta principal para abrir navegador, manipular UI, coletar snapshots de DOM/acessibilidade e capturar screenshots.
 

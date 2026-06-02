@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "productRepository": "italomanzine/Alexandria-UFSC",
+  "harnessRepository": "italomanzine/Harness-Engineering",
+  "projectUrl": "https://github.com/users/italomanzine/projects/3/views/1",
+  "defaultStitchProjectUrl": "https://stitch.withgoogle.com/projects/13111711788255953460?pli=1",
+  "stitchProjectName": "projects/13111711788255953460",
+  "kanban": {
+    "statusField": "Status",
+    "statuses": {
+      "backlog": "Backlog",
+      "ready": "Ready",
+      "inProgress": "In progress",
+      "inReview": "In review"
+    }
+  },
+  "rules": [
+    "Create product Issues/User Stories only in italomanzine/Alexandria-UFSC.",
+    "Track product Issues/User Stories in https://github.com/users/italomanzine/projects/3/views/1.",
+    "New /refine cards must start in Backlog.",
+    "/intent may start only when the card Status is Ready.",
+    "/intent moves the card to In progress when implementation starts.",
+    "/intent moves the card to In review after opening the PR.",
+    "Never create product Issues or PRs in italomanzine/Harness-Engineering."
+  ]
+}

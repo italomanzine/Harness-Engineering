@@ -7,7 +7,7 @@
       "description": "Valida a integridade operacional do harness."
     },
     "unit": {
-      "command": "",
+      "command": "rtk npm --prefix Alexandria-UFSC test",
       "description": "Placeholder para testes unitários do projeto de destino."
     },
     "integration": {
@@ -15,16 +15,20 @@
       "description": "Placeholder para testes de integração do projeto de destino."
     },
     "e2e": {
-      "command": "",
+      "command": "rtk npm --prefix Alexandria-UFSC run test:e2e",
       "description": "Placeholder para testes E2E do projeto de destino. Use Playwright como ferramenta principal para jornadas browser."
     },
     "lint": {
-      "command": "",
+      "command": "rtk npm --prefix Alexandria-UFSC run lint",
       "description": "Placeholder para lint do projeto de destino."
     },
     "typecheck": {
-      "command": "",
+      "command": "rtk npm --prefix Alexandria-UFSC run typecheck",
       "description": "Placeholder para typecheck do projeto de destino."
+    },
+    "build": {
+      "command": "rtk npm --prefix Alexandria-UFSC run build",
+      "description": "Build de produção do projeto de destino."
     },
     "visual": {
       "command": "",

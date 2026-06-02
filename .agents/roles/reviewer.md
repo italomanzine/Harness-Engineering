@@ -19,7 +19,7 @@ Use os contratos atuais do harness:
 - `.agents/skills/chrome-devtools/SKILL.md`
 - `.memory/last-evaluation.json`
 
-Arquivos em `docs/` são exemplos da palestra e não devem ser usados como fonte direta da revisão.
+Arquivos em `docs/` são exemplos e não devem ser usados como fonte direta da revisão.
 
 ## QUANDO ATUAR
 

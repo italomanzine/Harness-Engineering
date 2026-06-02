@@ -26,6 +26,18 @@ specs/<slug>/
 └── evaluation-contract.json
 ```
 
+## Targets Operacionais
+
+Os destinos de GitHub, Kanban e Stitch ficam em `.harness/github-targets.json`.
+
+- **Repo de produto:** `italomanzine/Alexandria-UFSC`
+- **Repo do harness:** `italomanzine/Harness-Engineering`
+- **GitHub Project:** `https://github.com/users/italomanzine/projects/3/views/1`
+- **Stitch Project:** `https://stitch.withgoogle.com/projects/13111711788255953460?pli=1`
+- **Stitch resource:** `projects/13111711788255953460`
+
+Issues/User Stories e PRs de produto nunca devem ser criados no repo do harness.
+
 ## Princípios
 
 - **SDD:** toda feature começa com uma spec antes de código.
@@ -125,17 +137,23 @@ Em um projeto real, substitua os comandos vazios por comandos concretos de lint,
 Use `/refine` para transformar uma ideia em spec e backlog.
 
 1. Orchestrator executa `scripts/bootstrap-context.sh`.
-2. Product Manager refina a ideia, reduz ambiguidades e define valor.
-3. Product Manager cria `specs/<slug>/spec.md`.
-4. A spec registra requisitos, critérios de aceite e cenários BDD.
-5. GitHub MCP cria ou atualiza cards de User Story.
-6. O ciclo atualiza `.memory/progress.md` e `.memory/session-context.json`.
+2. Orchestrator lê `.harness/github-targets.json`.
+3. Product Manager refina a ideia, reduz ambiguidades e define valor.
+4. Product Manager cria `specs/<slug>/spec.md`.
+5. A spec registra requisitos, critérios de aceite e cenários BDD.
+6. GitHub MCP cria ou atualiza Issues/User Stories em `italomanzine/Alexandria-UFSC`.
+7. Cada Issue é adicionada ao Project `https://github.com/users/italomanzine/projects/3/views/1`.
+8. Cards novos recebem `Status=Backlog`.
+9. Se houver UI, o card inclui Stitch Project, resource MCP, `.stitch/DESIGN.md`, diretrizes UI/UX, meta de 98% e evidência visual obrigatória no PR.
+10. O ciclo atualiza `.memory/progress.md` e `.memory/session-context.json`.
 
 Saída esperada:
 
 - `specs/<slug>/spec.md`
-- User Stories no GitHub Project/Issues
+- User Stories no repo `italomanzine/Alexandria-UFSC`
+- cards no Project 3 com `Status=Backlog`
 - critérios BDD por User Story
+- referência Stitch/UI quando houver interface
 - contexto atualizado em `.memory/`
 
 ## Fluxo `/intent`
@@ -143,24 +161,41 @@ Saída esperada:
 Use `/intent` para implementar uma User Story específica.
 
 1. Orchestrator executa `scripts/bootstrap-context.sh`.
-2. Orchestrator lê card/Issue via GitHub MCP e a spec correspondente.
-3. O fluxo cria `feature/<slug>` a partir da `main`.
-4. Architect cria `plan.md`, `tasks.md` e `evaluation-contract.json`.
-5. Evaluator valida o contrato antes do Coder começar.
-6. Coder implementa no máximo 1 User Story ou 5 tasks por ciclo.
-7. Coder segue TDD e mapeia cenários BDD para testes ou evidências.
-8. Coder declara `ready_for_evaluation`.
-9. Evaluator executa `scripts/evaluate.sh <feature-dir>`.
-10. Reviewer revisa somente após `PASS`.
-11. GitHub MCP cria PR para `main` com links, resumo e evidências.
+2. Orchestrator lê `.harness/github-targets.json`.
+3. Orchestrator lê card/Issue em `italomanzine/Alexandria-UFSC` via GitHub MCP e a spec correspondente.
+4. O card deve estar no Project 3 com `Status=Ready`; caso contrário, o fluxo para.
+5. Ao iniciar, o card é movido para `In progress`.
+6. O fluxo cria `feature/<slug>` a partir da `main` no repo de produto.
+7. Architect cria `plan.md`, `tasks.md` e `evaluation-contract.json`.
+8. Evaluator valida o contrato antes do Coder começar.
+9. Coder implementa no máximo 1 User Story ou 5 tasks por ciclo.
+10. Coder segue TDD e mapeia cenários BDD para testes ou evidências.
+11. Coder declara `ready_for_evaluation`.
+12. Evaluator executa `scripts/evaluate.sh <feature-dir>`.
+13. Reviewer revisa somente após `PASS`.
+14. GitHub MCP cria PR para `main` em `italomanzine/Alexandria-UFSC` com links, resumo e evidências.
+15. Após PR aberto, o card é movido para `In review`.
 
 O PR só pode ser aberto quando `scripts/evaluate.sh <feature-dir>` retornar `0`.
+O card não é movido automaticamente para concluído; a validação humana decide o próximo status.
+
+## Kanban
+
+- `/refine` cria cards em `Backlog`.
+- Um humano ou processo externo move cards para `Ready`.
+- `/intent` só puxa cards em `Ready`.
+- `/intent` move o card para `In progress` ao iniciar implementação.
+- `/intent` move o card para `In review` após abrir o PR.
+- Nenhum agente move card automaticamente para concluído.
 
 ## UI/UX
 
 Para mudanças visuais ou interativas:
 
 - Use Stitch MCP como referência visual. O servidor esperado no MCP local é `stitch`.
+- Use o protótipo `https://stitch.withgoogle.com/projects/13111711788255953460?pli=1`.
+- Use o resource MCP `projects/13111711788255953460`.
+- Use `.stitch/DESIGN.md` como fonte visual operacional real.
 - Use `ui-ux-pro-max` para avaliar layout, hierarquia, acessibilidade, tipografia, cores, responsividade e interação.
 - Use Playwright como ferramenta principal para abrir navegador, manipular UI, coletar snapshots e capturar screenshots.
 - Use Chrome DevTools apenas como diagnóstico complementar.
@@ -229,12 +264,13 @@ GEMINI.md                  Instruções compatíveis com Gemini
 .agents/skills/            Skills instaladas
 .skills/                   Skills locais simples
 .harness/workflow.md       Coreografia dos fluxos
+.harness/github-targets.json
 .harness/sensors.json      Sensores determinísticos
 .harness/browser-validation.md
 .memory/                   Estado, progresso e avaliação
 .mcp.example.json          Exemplo de configuração MCP versionável
 .specify/                  Spec Kit, templates e constituição
-.stitch/                   Contexto de design Stitch
+.stitch/                   Contexto operacional do protótipo Stitch real
 specs/                     Specs, planos, tasks e contratos
 scripts/                   Bootstrap, validação e avaliação
 ```
@@ -244,6 +280,10 @@ scripts/                   Bootstrap, validação e avaliação
 ## Regras Obrigatórias
 
 - Nunca commitar direto em `main` ou `master`.
+- Issues/User Stories e PRs de produto devem usar `italomanzine/Alexandria-UFSC`.
+- `/refine` cria cards novos em `Backlog`.
+- `/intent` só inicia cards em `Ready`.
+- `/intent` move cards para `In progress` ao iniciar e `In review` após PR.
 - Toda implementação de `/intent` deve usar branch `feature/<slug>`.
 - Toda feature deve ter spec antes de implementação.
 - Todo plano deve mapear requisitos e cenários BDD para testes ou evidências.
@@ -252,16 +292,17 @@ scripts/                   Bootstrap, validação e avaliação
 - Evaluator nunca implementa.
 - Reviewer não aprova sem `PASS` em `.memory/last-evaluation.json`.
 - PR só abre após `scripts/evaluate.sh <feature-dir>` retornar `0`.
-- Mudanças de UI exigem evidência visual quando marcadas no contrato.
+- Mudanças de UI exigem `.stitch/DESIGN.md`, referência ao protótipo real e evidência visual quando marcadas no contrato.
 - Fontes operacionais não devem depender diretamente de arquivos dentro de `docs/`.
 
 ## Uso Otimizado
 
 1. Configure os MCPs copiando `.mcp.example.json` para `.mcp.json`, preenchendo a API key do Stitch apenas no arquivo local.
 2. Atualize `.harness/sensors.json` com comandos reais do projeto que usará o harness.
-3. Use `/refine` para criar spec e cards antes de implementar.
-4. Use `/intent` para desenvolver uma User Story por vez.
-5. Execute bootstrap no início de ciclos longos.
-6. Execute `rtk bash scripts/validate.sh` antes de considerar o harness saudável.
-7. Execute `rtk bash scripts/evaluate.sh specs/<slug>` antes de revisão e PR.
-8. Anexe evidências visuais ao PR sempre que houver mudança de frontend.
+3. Use `/refine` para criar spec e cards `Backlog` no repo de produto.
+4. Mova manualmente cards aprovados para `Ready`.
+5. Use `/intent` para desenvolver uma User Story `Ready` por vez.
+6. Execute bootstrap no início de ciclos longos.
+7. Execute `rtk bash scripts/validate.sh` antes de considerar o harness saudável.
+8. Execute `rtk bash scripts/evaluate.sh specs/<slug>` antes de revisão e PR.
+9. Anexe evidências visuais ao PR sempre que houver mudança de frontend.

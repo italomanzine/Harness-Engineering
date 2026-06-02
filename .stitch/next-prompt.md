@@ -1,7 +1,3 @@
----
-page: exemplo
----
+Use the real Stitch prototype `projects/13111711788255953460` as the visual reference.
 
-Descreva aqui a próxima tela ou ajuste visual a ser enviado ao Stitch MCP.
-
-Inclua o bloco relevante de `.stitch/DESIGN.md` antes de gerar a tela.
+For UI work, preserve the High-End Editorial style in `.stitch/DESIGN.md`: Noto Serif headlines, Inter body text, Public Sans labels, tonal surface hierarchy without 1px borders, primary blue actions, archival gold highlights, and minimum 98% visual similarity against the Stitch design.

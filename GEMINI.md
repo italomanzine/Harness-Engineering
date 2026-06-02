@@ -6,36 +6,42 @@ Este arquivo define como o Gemini CLI deve operar dentro do framework de **Harne
 Sempre que o usuário iniciar uma solicitação com `/refine` ou pedir para refinar uma feature:
 
 1. **Product Manager:** Use `.agents/roles/product_manager.md`.
-2. **Spec Driven Development:** Use o backbone GitHub Spec Kit: `Spec -> Plan -> Tasks -> Implement`.
-3. **Spec:** Crie `specs/<slug>/spec.md` usando `.specify/templates/spec-template.md`.
-4. **BDD:** Registre critérios em `Dado / Quando / Então`.
-5. **GitHub Project:** Use MCP GitHub para criar/atualizar cards de User Story.
-6. **Sem Código:** Não implemente a feature durante `/refine`.
+2. **Targets:** Leia `.harness/github-targets.json`.
+3. **Spec Driven Development:** Use o backbone GitHub Spec Kit: `Spec -> Plan -> Tasks -> Implement`.
+4. **Spec:** Crie `specs/<slug>/spec.md` usando `.specify/templates/spec-template.md`.
+5. **BDD:** Registre critérios em `Dado / Quando / Então`.
+6. **GitHub Project:** Use MCP GitHub para criar/atualizar Issues/User Stories em `italomanzine/Alexandria-UFSC`, trackear no Project 3 e definir `Status=Backlog`.
+7. **Stitch:** Se houver UI, inclua link Stitch, resource MCP, `.stitch/DESIGN.md` e diretrizes de 98% de similaridade visual.
+8. **Sem Código:** Não implemente a feature durante `/refine`.
 
 ## 🚀 O Comando `/intent`
 Sempre que o usuário iniciar uma solicitação com `/intent` ou pedir para resolver uma Issue/User Story:
 
 1.  **Orquestração:** Siga rigorosamente o fluxo definido em `.harness/workflow.md`.
-2.  **Contexto:** Utilize o **MCP GitHub** para extrair detalhes da tarefa se um link for fornecido.
-3.  **Branch:** Nunca trabalhe em `main` ou `master`; crie `feature/<slug>` a partir da `main`.
-4.  **Planejamento:** Crie/valide `specs/<slug>/plan.md`, `specs/<slug>/tasks.md` e `specs/<slug>/evaluation-contract.json`.
-5.  **Contrato:** Invoque o Evaluator para validar o contrato antes do Coder começar.
-6.  **TDD/BDD:** Implemente no máximo 1 User Story ou 5 tasks por ciclo com Red -> Green -> Refactor.
-7.  **Avaliação:** Execute `scripts/evaluate.sh <feature-dir>`; só prossiga se retornar `0`.
-8.  **PR:** Ao concluir, abra PR para `main` via MCP GitHub somente após `PASS`.
+2.  **Targets:** Leia `.harness/github-targets.json`.
+3.  **Contexto:** Utilize o **MCP GitHub** para extrair detalhes da tarefa em `italomanzine/Alexandria-UFSC`.
+4.  **Ready Gate:** Só inicie se o card estiver no Project 3 com `Status=Ready`; caso contrário, pare.
+5.  **Kanban:** Ao iniciar, mova o card para `In progress`.
+6.  **Branch:** Nunca trabalhe em `main` ou `master`; crie `feature/<slug>` a partir da `main` no repo de produto.
+7.  **Planejamento:** Crie/valide `specs/<slug>/plan.md`, `specs/<slug>/tasks.md` e `specs/<slug>/evaluation-contract.json`.
+8.  **Contrato:** Invoque o Evaluator para validar o contrato antes do Coder começar.
+9.  **TDD/BDD:** Implemente no máximo 1 User Story ou 5 tasks por ciclo com Red -> Green -> Refactor.
+10. **Avaliação:** Execute `scripts/evaluate.sh <feature-dir>`; só prossiga se retornar `0`.
+11. **PR:** Ao concluir, abra PR para `main` em `italomanzine/Alexandria-UFSC` via MCP GitHub somente após `PASS`.
+12. **Kanban Review:** Após abrir PR, mova o card para `In review` e aguarde validação humana.
 
 ## 🧠 Agentes e Skills
 - **Agentes:** Utilize as personas em `.agents/roles/` para guiar cada fase.
 - **Skills:** Aplique os padrões de raciocínio em `.skills/`.
 - **Spec Kit:** Use `.specify/constitution.md` e `.specify/templates/` como contratos do fluxo SDD.
 - **TLC:** Use `.agents/skills/tlc-spec-driven/SKILL.md` como skill auxiliar para auto-sizing e memória.
-- **Stitch:** Para frontend, use o Stitch MCP HTTP configurado como `stitch` em `.mcp.json`, `.agents/skills/stitch-loop/SKILL.md`, `.agents/skills/design-md/SKILL.md` e `.agents/skills/enhance-prompt/SKILL.md`.
+- **Stitch:** Para frontend, use o Stitch MCP HTTP configurado como `stitch` em `.mcp.json`, o protótipo `https://stitch.withgoogle.com/projects/13111711788255953460?pli=1`, o resource `projects/13111711788255953460`, `.stitch/DESIGN.md`, `.agents/skills/stitch-loop/SKILL.md`, `.agents/skills/design-md/SKILL.md` e `.agents/skills/enhance-prompt/SKILL.md`.
 - **UI/UX:** Para frontend, use `.agents/skills/ui-ux-pro-max/SKILL.md` para acessibilidade, responsividade, interação, tipografia, cores e hierarquia visual.
 - **Browser:** Use `.agents/skills/playwright/SKILL.md` como ferramenta principal de navegador e `.agents/skills/chrome-devtools/SKILL.md` como diagnóstico complementar.
 - **Evaluator:** Use `.agents/roles/evaluator.md` para validação binária por sensores.
 
 ## 📚 Pasta `docs/`
-`docs/` contém apenas exemplos e material de inspiração para a palestra. Não use arquivos de `docs/` como dependência direta dos fluxos `/refine` ou `/intent`.
+`docs/` contém apenas exemplos e material de inspiração. Não use arquivos de `docs/` como dependência direta dos fluxos `/refine` ou `/intent`.
 
 ## 🛡️ O Harness (Validação Obrigatória)
 **NENHUMA** alteração de código é considerada final sem passar pelo Harness.
