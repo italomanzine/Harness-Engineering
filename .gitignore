@@ -43,6 +43,8 @@ Thumbs.db
 # Local Harness Engineering artifacts
 estrutura-slides.md
 harness-model.png
+harness-state-diagrama-v3_17 (1).png
+HARNESS_CONCEPT.md
 
 # Ignore the Alexandria-UFSC directory, but keep the .gitkeep file
 Alexandria-UFSC/*
