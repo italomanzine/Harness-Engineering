@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": ".",
+			"name": "Harness Engineering"
+		},
+		{
+			"path": "Alexandria-UFSC",
+			"name": "Alexandria-UFSC"
+		}
+	],
+	"settings": {
+		"chat.tools.terminal.autoApprove": {
+			".specify/scripts/bash/": true,
+			".specify/scripts/powershell/": true
+		}
+	}
+}

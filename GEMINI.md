@@ -29,7 +29,7 @@ Sempre que o usuário iniciar uma solicitação com `/intent` ou pedir para reso
 - **Skills:** Aplique os padrões de raciocínio em `.skills/`.
 - **Spec Kit:** Use `.specify/constitution.md` e `.specify/templates/` como contratos do fluxo SDD.
 - **TLC:** Use `.agents/skills/tlc-spec-driven/SKILL.md` como skill auxiliar para auto-sizing e memória.
-- **Stitch:** Para frontend, use Stitch MCP, `.agents/skills/stitch-loop/SKILL.md`, `.agents/skills/design-md/SKILL.md` e `.agents/skills/enhance-prompt/SKILL.md`.
+- **Stitch:** Para frontend, use o Stitch MCP HTTP configurado como `stitch` em `.mcp.json`, `.agents/skills/stitch-loop/SKILL.md`, `.agents/skills/design-md/SKILL.md` e `.agents/skills/enhance-prompt/SKILL.md`.
 - **UI/UX:** Para frontend, use `.agents/skills/ui-ux-pro-max/SKILL.md` para acessibilidade, responsividade, interação, tipografia, cores e hierarquia visual.
 - **Browser:** Use `.agents/skills/playwright/SKILL.md` como ferramenta principal de navegador e `.agents/skills/chrome-devtools/SKILL.md` como diagnóstico complementar.
 - **Evaluator:** Use `.agents/roles/evaluator.md` para validação binária por sensores.

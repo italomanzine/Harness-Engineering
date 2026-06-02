@@ -34,7 +34,7 @@ Este repositório demonstra Harness Engineering para uma palestra.
 
 ## Frontend com Stitch
 
-- Use Stitch MCP quando houver design/protótipo.
+- Use Stitch MCP quando houver design/protótipo. O servidor deve estar configurado como `stitch` em `.mcp.json`, usando HTTP em `https://stitch.googleapis.com/mcp` com header `X-Goog-Api-Key`.
 - Use `.agents/skills/ui-ux-pro-max/SKILL.md` para melhorar precisão de UI/UX.
 - Use `.agents/skills/playwright/SKILL.md` como browser principal para jornadas, snapshots e screenshots.
 - Use `.agents/skills/chrome-devtools/SKILL.md` apenas para diagnóstico de console, rede, performance e DOM ao vivo.

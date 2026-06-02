@@ -101,6 +101,11 @@ if ! jq -e '.sensors.harness.command | length > 0' .harness/sensors.json >/dev/n
   exit 1
 fi
 
+if ! jq -e '.mcpServers.stitch.type == "http" and .mcpServers.stitch.url == "https://stitch.googleapis.com/mcp" and (.mcpServers.stitch.headers["X-Goog-Api-Key"] | length > 0)' .mcp.example.json >/dev/null; then
+  echo "MCP Stitch HTTP ausente ou mal configurado em .mcp.example.json."
+  exit 1
+fi
+
 bad_docs_file_refs="$(grep -R -E "docs/[A-Za-z0-9_.() -]+\\.(md|html|png|json|sh|txt)" AGENTS.md GEMINI.md .github/copilot-instructions.md .harness .agents/roles .specify/memory/constitution.md || true)"
 if [[ -n "$bad_docs_file_refs" ]]; then
   echo "Referencia operacional indevida a arquivo de docs/ encontrada."

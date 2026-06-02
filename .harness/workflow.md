@@ -51,7 +51,8 @@ Este arquivo define a coreografia simples dos agentes para a palestra.
 
 ### 5. Loop Visual com Stitch
 - **Quando:** Mudanças de frontend.
-- **Ferramentas:** Stitch MCP, `.agents/skills/stitch-loop/SKILL.md`, `.agents/skills/design-md/SKILL.md`, `.agents/skills/enhance-prompt/SKILL.md`, `.agents/skills/ui-ux-pro-max/SKILL.md`.
+- **Ferramentas:** Stitch MCP HTTP no servidor `stitch`, `.agents/skills/stitch-loop/SKILL.md`, `.agents/skills/design-md/SKILL.md`, `.agents/skills/enhance-prompt/SKILL.md`, `.agents/skills/ui-ux-pro-max/SKILL.md`.
+- **Configuração:** `.mcp.json` deve conter `mcpServers.stitch.type=http`, `url=https://stitch.googleapis.com/mcp` e header `X-Goog-Api-Key`.
 - **Browser principal:** `.agents/skills/playwright/SKILL.md` e Playwright MCP para jornadas, snapshots de DOM/acessibilidade e screenshots.
 - **Diagnóstico:** `.agents/skills/chrome-devtools/SKILL.md` e Chrome DevTools MCP para console, rede, traces e DOM ao vivo quando Playwright não explicar a falha.
 - **Meta:** Pelo menos 98% de similaridade visual com o design do Stitch.

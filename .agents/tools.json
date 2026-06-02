@@ -14,8 +14,10 @@
       ]
     },
     {
-      "name": "mcp-stitch",
+      "name": "stitch",
       "description": "Integração com protótipos, telas e evidências visuais do Stitch",
+      "type": "http",
+      "url": "https://stitch.googleapis.com/mcp",
       "allowed_methods": [
         "list_projects",
         "get_project",

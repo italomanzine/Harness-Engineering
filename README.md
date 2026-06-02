@@ -95,11 +95,12 @@ npx skills add https://github.com/tech-leads-club/agent-skills --skill tlc-spec-
 Configure os MCPs a partir de `.mcp.example.json`.
 
 - **GitHub MCP:** Issues, Projects, branches, PRs, comentários e anexos.
-- **Stitch MCP:** leitura de protótipos, telas e evidências visuais.
+- **Stitch MCP:** leitura de protótipos, telas e evidências visuais via servidor HTTP `stitch` em `https://stitch.googleapis.com/mcp`.
 - **Playwright MCP:** navegação, manipulação de UI, snapshots e screenshots.
 - **Chrome DevTools MCP:** diagnóstico complementar para console, rede, DOM e performance.
 
 `.mcp.json` é configuração local e não deve ser versionado.
+No `.mcp.json`, substitua o placeholder `X-Goog-Api-Key` pela chave real. Não coloque segredos em `.mcp.example.json`.
 
 ## Sensores
 
@@ -159,7 +160,7 @@ O PR só pode ser aberto quando `scripts/evaluate.sh <feature-dir>` retornar `0`
 
 Para mudanças visuais ou interativas:
 
-- Use Stitch MCP como referência visual.
+- Use Stitch MCP como referência visual. O servidor esperado no MCP local é `stitch`.
 - Use `ui-ux-pro-max` para avaliar layout, hierarquia, acessibilidade, tipografia, cores, responsividade e interação.
 - Use Playwright como ferramenta principal para abrir navegador, manipular UI, coletar snapshots e capturar screenshots.
 - Use Chrome DevTools apenas como diagnóstico complementar.
@@ -256,7 +257,7 @@ scripts/                   Bootstrap, validação e avaliação
 
 ## Uso Otimizado
 
-1. Configure os MCPs copiando `.mcp.example.json` para `.mcp.json` e ajustando o necessário localmente.
+1. Configure os MCPs copiando `.mcp.example.json` para `.mcp.json`, preenchendo a API key do Stitch apenas no arquivo local.
 2. Atualize `.harness/sensors.json` com comandos reais do projeto que usará o harness.
 3. Use `/refine` para criar spec e cards antes de implementar.
 4. Use `/intent` para desenvolver uma User Story por vez.

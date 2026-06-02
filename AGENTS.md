@@ -93,7 +93,9 @@ Objetivo:
 ## MCPs Esperados
 
 - GitHub MCP: Issues, Projects, branches, PRs, comentários e anexos.
-- Stitch MCP: leitura do protótipo, geração/consulta de telas e screenshots.
+- Stitch MCP (`stitch`): servidor HTTP em `https://stitch.googleapis.com/mcp`, configurado em `.mcp.json` com header `X-Goog-Api-Key`.
+- Playwright MCP: browser principal para jornadas, DOM, acessibilidade e screenshots.
+- Chrome DevTools MCP: diagnóstico complementar para console, rede, performance e DOM.
 
 ## Skills Recomendadas
 
