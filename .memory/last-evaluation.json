@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "featureDir": "specs/demo-feature",
+  "contract": "specs/demo-feature/evaluation-contract.json",
+  "evaluatedAt": "2026-06-02T04:33:06.403893+00:00",
+  "checks": [
+    {
+      "name": "harness",
+      "status": "PASS",
+      "exitCode": 0,
+      "command": "rtk bash scripts/validate.sh",
+      "stdout": "Iniciando validacao do Harness...\nHarness validado com sucesso.\n",
+      "stderr": "[rtk] WARNING: untrusted project filters (.rtk/filters.toml)\n[rtk] Filters NOT applied. Run `rtk trust` to review and enable.\n"
+    }
+  ],
+  "errors": []
+}

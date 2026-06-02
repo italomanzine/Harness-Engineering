@@ -1,0 +1,49 @@
+# Local MCP configuration
+.mcp.json
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Dependency directories
+node_modules/
+.pnpm-store/
+
+# Build and cache output
+dist/
+build/
+.cache/
+.tmp/
+tmp/
+coverage/
+output/playwright/
+output/chrome-devtools/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+
+# Local Stitch runtime artifacts
+.stitch/metadata.json
+.stitch/designs/
+
+# Local Harness Engineering artifacts
+estrutura-slides.md
+harness-model.png
+
+# Ignore the Alexandria-UFSC directory, but keep the .gitkeep file
+Alexandria-UFSC/*
+!Alexandria-UFSC/.gitkeep

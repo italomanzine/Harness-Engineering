@@ -1,0 +1,34 @@
+{
+  "tools": [
+    {
+      "name": "mcp-github",
+      "description": "Integração com Issues e PRs do GitHub",
+      "allowed_methods": [
+        "get_issue",
+        "create_issue",
+        "create_branch",
+        "create_pull_request",
+        "add_pr_comment",
+        "upload_pr_evidence",
+        "update_project_item"
+      ]
+    },
+    {
+      "name": "mcp-stitch",
+      "description": "Integração com protótipos, telas e evidências visuais do Stitch",
+      "allowed_methods": [
+        "list_projects",
+        "get_project",
+        "list_screens",
+        "get_screen",
+        "generate_screen",
+        "download_screenshot"
+      ]
+    },
+    {
+      "name": "harness-validator",
+      "path": "scripts/validate.sh",
+      "description": "Roda o conjunto completo de testes e linters"
+    }
+  ]
+}

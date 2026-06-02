@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "description": "Sensores determinísticos do harness. Apenas checks listados no evaluation-contract.json são executados.",
+  "sensors": {
+    "harness": {
+      "command": "rtk bash scripts/validate.sh",
+      "description": "Valida a integridade operacional do harness."
+    },
+    "unit": {
+      "command": "",
+      "description": "Placeholder para testes unitários do projeto de destino."
+    },
+    "integration": {
+      "command": "",
+      "description": "Placeholder para testes de integração do projeto de destino."
+    },
+    "e2e": {
+      "command": "",
+      "description": "Placeholder para testes E2E do projeto de destino. Use Playwright como ferramenta principal para jornadas browser."
+    },
+    "lint": {
+      "command": "",
+      "description": "Placeholder para lint do projeto de destino."
+    },
+    "typecheck": {
+      "command": "",
+      "description": "Placeholder para typecheck do projeto de destino."
+    },
+    "visual": {
+      "command": "",
+      "description": "Placeholder para comparação visual/Stitch do projeto de destino. Evidências devem ser capturadas com Stitch/Playwright e listadas em visualEvidence."
+    },
+    "browser-evidence": {
+      "command": "",
+      "description": "Placeholder para validação browser via Playwright MCP/skill. Use apenas quando houver comando automatizado real; caso contrário, use visualEvidence no contrato."
+    },
+    "chrome-diagnostics": {
+      "command": "",
+      "description": "Placeholder para diagnósticos Chrome DevTools MCP. Não usar como gate primário sem comando determinístico."
+    }
+  }
+}

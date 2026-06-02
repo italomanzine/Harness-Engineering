@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "stitch-mcp": {
+      "command": "npx",
+      "args": ["-y", "stitch-mcp"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest", "--caps=vision,pdf,devtools"]
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest", "--isolated=true", "--viewport=1920x1080"]
+    }
+  }
+}

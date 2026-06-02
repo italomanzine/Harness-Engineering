@@ -1,0 +1,27 @@
+{
+  "featureDir": "specs/demo-feature",
+  "branch": "feature/demo-feature",
+  "scope": [
+    "Demonstrar avaliação binária com sensor externo"
+  ],
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "description": "O harness deve validar um contrato mínimo usando sensor determinístico."
+    }
+  ],
+  "bddScenarios": [
+    {
+      "id": "SCN-001",
+      "given": "um contrato de avaliação com o sensor harness",
+      "when": "o Evaluator executa scripts/evaluate.sh",
+      "then": "o resultado deve ser PASS",
+      "verification": "rtk bash scripts/evaluate.sh specs/demo-feature"
+    }
+  ],
+  "checks": [
+    "harness"
+  ],
+  "visualEvidenceRequired": false,
+  "maxCycles": 3
+}
