@@ -8,8 +8,8 @@ Nunca desenvolva direto na `main` ou `master`.
 
 Todo fluxo `/intent` deve:
 1. Ler `.harness/github-targets.json`.
-2. Ler a User Story no GitHub Project/Issue do repo `italomanzine/Alexandria-UFSC`.
-3. Confirmar que o card está no Project 3 com `Status=Ready`.
+2. Ler a User Story no GitHub Project/Issue configurado em `productRepository` e `projectUrl`.
+3. Confirmar que o card está no Project configurado com `Status=Ready`.
 4. Mover o card para `In progress`.
 5. Ler `specs/<slug>/spec.md`.
 6. Criar `specs/<slug>/plan.md`, `specs/<slug>/tasks.md` e `specs/<slug>/evaluation-contract.json`.
@@ -18,7 +18,7 @@ Todo fluxo `/intent` deve:
 9. Implementar no máximo 1 User Story ou 5 tasks por ciclo com TDD.
 10. Declarar `ready_for_evaluation`.
 11. Rodar `scripts/evaluate.sh <feature-dir>`.
-12. Abrir PR para `main` em `italomanzine/Alexandria-UFSC` usando GitHub MCP somente se a avaliação retornar `0`.
+12. Abrir PR para `main` no `productRepository` usando GitHub MCP somente se a avaliação retornar `0`.
 13. Mover o card para `In review` para validação humana.
 
 ## Backbone SDD
@@ -70,8 +70,8 @@ Objetivo:
 - Refinar uma ideia de feature com abordagem Spec Driven Development.
 - Criar uma spec Markdown em `specs/<slug>/spec.md`.
 - Escrever critérios BDD em `Dado / Quando / Então`.
-- Criar ou atualizar Issues/User Stories em `italomanzine/Alexandria-UFSC` via GitHub MCP.
-- Trackear cards no Project `https://github.com/users/italomanzine/projects/3/views/1`.
+- Criar ou atualizar Issues/User Stories no `productRepository` via GitHub MCP.
+- Trackear cards no `projectUrl`.
 - Definir cards novos com `Status=Backlog`.
 - Registrar critérios de aceite, design esperado, dependências e riscos.
 - Incluir link Stitch, resource MCP e diretrizes UI/UX no card quando houver interface.
@@ -142,7 +142,7 @@ Se os comandos de sensores não fizerem sentido no projeto de destino, adapte `.
 
 Para qualquer mudança visual ou interativa, use `.agents/skills/ui-ux-pro-max/SKILL.md` junto com Stitch.
 
-Use o protótipo `https://stitch.withgoogle.com/projects/13111711788255953460?pli=1`, resource MCP `projects/13111711788255953460` e `.stitch/DESIGN.md` como fonte visual operacional real.
+Use o Stitch configurado em `.harness/github-targets.json` e `.stitch/DESIGN.md` como fonte visual operacional. Em modo playground, trate `.stitch/` como referência read-only e edite apenas um projeto Stitch próprio.
 
 Use `.agents/skills/playwright/SKILL.md` como ferramenta principal para abrir navegador, manipular UI, coletar snapshots de DOM/acessibilidade e capturar screenshots.
 

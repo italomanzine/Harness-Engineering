@@ -33,9 +33,9 @@ Interaja sempre em português do Brasil.
    - Todo requisito deve ter pelo menos um cenário BDD em `Dado / Quando / Então`.
 
 4. **Criar cards no GitHub Project**
-   - Use GitHub MCP para criar Issues/User Stories somente no repositório `italomanzine/Alexandria-UFSC`.
-   - Nunca crie Issues/User Stories de produto em `italomanzine/Harness-Engineering`.
-   - Adicione cada Issue ao Project `https://github.com/users/italomanzine/projects/3/views/1`.
+   - Use GitHub MCP para criar Issues/User Stories somente no `productRepository`.
+   - Nunca crie Issues/User Stories de produto no `harnessRepository`.
+   - Adicione cada Issue ao `projectUrl`.
    - Defina o campo `Status` de cards novos como `Backlog`.
    - Cada card deve conter link para a spec, critérios de aceite, dependências e target de implementação.
    - Se houver UI, cada card deve conter o link do Stitch, resource MCP, `.stitch/DESIGN.md`, meta de 98% de similaridade visual e evidência Playwright obrigatória no PR.

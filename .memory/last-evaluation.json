@@ -1,8 +1,8 @@
 {
   "status": "PASS",
-  "featureDir": "specs/calculadora-sobrevivencia-academica",
-  "contract": "specs/calculadora-sobrevivencia-academica/evaluation-contract.json",
-  "evaluatedAt": "2026-06-02T07:49:29.980406+00:00",
+  "featureDir": "specs/demo-feature",
+  "contract": "specs/demo-feature/evaluation-contract.json",
+  "evaluatedAt": "2026-06-03T21:07:02.764624+00:00",
   "checks": [
     {
       "name": "harness",
@@ -11,46 +11,6 @@
       "command": "rtk bash scripts/validate.sh",
       "stdout": "Iniciando validacao do Harness...\nHarness validado com sucesso.\n",
       "stderr": "[rtk] WARNING: untrusted project filters (.rtk/filters.toml)\n[rtk] Filters NOT applied. Run `rtk trust` to review and enable.\n"
-    },
-    {
-      "name": "lint",
-      "status": "PASS",
-      "exitCode": 0,
-      "command": "rtk npm --prefix Alexandria-UFSC run lint",
-      "stdout": "> eslint .\n",
-      "stderr": ""
-    },
-    {
-      "name": "typecheck",
-      "status": "PASS",
-      "exitCode": 0,
-      "command": "rtk npm --prefix Alexandria-UFSC run typecheck",
-      "stdout": "> tsc --noEmit\n",
-      "stderr": ""
-    },
-    {
-      "name": "build",
-      "status": "PASS",
-      "exitCode": 0,
-      "command": "rtk npm --prefix Alexandria-UFSC run build",
-      "stdout": "> next build\n▲ Next.js 16.2.7 (Turbopack)\n  Creating an optimized production build ...\n✓ Compiled successfully in 1123ms\n  Running TypeScript ...\n  Finished TypeScript in 1499ms ...\n  Collecting page data using 4 workers ...\n  Generating static pages using 4 workers (0/3) ...\n✓ Generating static pages using 4 workers (3/3) in 246ms\n  Finalizing page optimization ...\nRoute (app)\n┌ ○ /\n└ ○ /_not-found\n○  (Static)  prerendered as static content\n",
-      "stderr": ""
-    },
-    {
-      "name": "unit",
-      "status": "PASS",
-      "exitCode": 0,
-      "command": "rtk npm --prefix Alexandria-UFSC test",
-      "stdout": "> vitest run\n RUN  v4.1.8 /home/manzine/Italo/Palestras/Harness-Engineering/Alexandria-UFSC/apps/web\n Test Files  2 passed (2)\n      Tests  10 passed (10)\n   Start at  04:49:21\n   Duration  714ms (transform 77ms, setup 105ms, import 132ms, tests 223ms, environment 490ms)\n",
-      "stderr": ""
-    },
-    {
-      "name": "e2e",
-      "status": "PASS",
-      "exitCode": 0,
-      "command": "rtk npm --prefix Alexandria-UFSC run test:e2e",
-      "stdout": "> npm run build && playwright test\n> next build\n▲ Next.js 16.2.7 (Turbopack)\n  Creating an optimized production build ...\n✓ Compiled successfully in 1169ms\n  Running TypeScript ...\n  Finished TypeScript in 1504ms ...\n  Collecting page data using 4 workers ...\n  Generating static pages using 4 workers (0/3) ...\n✓ Generating static pages using 4 workers (3/3) in 246ms\n  Finalizing page optimization ...\nRoute (app)\n┌ ○ /\n└ ○ /_not-found\n○  (Static)  prerendered as static content\nRunning 14 tests using 2 workers\n  ✓   1 [mobile] › e2e/calculadora.spec.ts:11:1 › SCN-001 estrutura principal e navegacao futura (219ms)\n  ✓   2 [desktop] › e2e/calculadora.spec.ts:11:1 › SCN-001 estrutura principal e navegacao futura (227ms)\n  ✓   4 [desktop] › e2e/calculadora.spec.ts:31:1 › SCN-002 calcula nota necessaria na proxima avaliacao (192ms)\n  ✓   3 [mobile] › e2e/calculadora.spec.ts:31:1 › SCN-002 calcula nota necessaria na proxima avaliacao (204ms)\n  ✓   6 [mobile] › e2e/calculadora.spec.ts:36:1 › SCN-003 frequencia insuficiente (213ms)\n  ✓   5 [desktop] › e2e/calculadora.spec.ts:36:1 › SCN-003 frequencia insuficiente (248ms)\n  ✓   7 [mobile] › e2e/calculadora.spec.ts:42:1 › SCN-004 e SCN-005 recuperacao e media final apos REC (205ms)\n  ✓   8 [desktop] › e2e/calculadora.spec.ts:42:1 › SCN-004 e SCN-005 recuperacao e media final apos REC (195ms)\n  ✓   9 [mobile] › e2e/calculadora.spec.ts:48:1 › SCN-006 explica arredondamento 5,75 (148ms)\n  ✓  10 [desktop] › e2e/calculadora.spec.ts:48:1 › SCN-006 explica arredondamento 5,75 (141ms)\n  ✓  12 [desktop] › e2e/calculadora.spec.ts:52:1 › SCN-007 mobile mostra links futuros e captura evidencia (257ms)\n  ✓  13 [desktop] › e2e/calculadora.spec.ts:63:1 › SCN-008 foco por teclado e perceptivel (126ms)\n  ✓  11 [mobile] › e2e/calculadora.spec.ts:52:1 › SCN-007 mobile mostra links futuros e captura evidencia (511ms)\n  ✓  14 [mobile] › e2e/calculadora.spec.ts:63:1 › SCN-008 foco por teclado e perceptivel (163ms)\n  14 passed (2.7s)\n\u001b[2m[WebServer] \u001b[22m(node:477650) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n\u001b[2m[WebServer] \u001b[22m(Use `node --trace-warnings ...` to show where the warning was created)\n(node:477662) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:477661) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:477662) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:477661) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n",
-      "stderr": ""
     }
   ],
   "errors": []

@@ -18,11 +18,11 @@ Este arquivo define a coreografia operacional dos agentes.
 
 ### 3. Backlog
 - **Ferramenta:** GitHub MCP.
-- **Repositório:** Criar Issues/User Stories somente em `italomanzine/Alexandria-UFSC`.
-- **Projeto:** Adicionar cada Issue ao Project `https://github.com/users/italomanzine/projects/3/views/1`.
+- **Repositório:** Criar Issues/User Stories somente no `productRepository`.
+- **Projeto:** Adicionar cada Issue ao `projectUrl`.
 - **Kanban:** Definir `Status=Backlog` para cards novos.
 - **Regra:** Cada card deve linkar a spec, conter critérios de aceite BDD, target de implementação e, se houver UI, link Stitch, resource Stitch, `.stitch/DESIGN.md`, meta de 98% de similaridade e evidência visual obrigatória no PR.
-- **Bloqueio:** Nunca criar Issues/User Stories de produto em `italomanzine/Harness-Engineering`.
+- **Bloqueio:** Nunca criar Issues/User Stories de produto no `harnessRepository`.
 - **Memória:** Atualizar `.memory/progress.md` e `.memory/session-context.json`.
 
 ## Fluxo 2: `/intent`
@@ -34,8 +34,8 @@ Este arquivo define a coreografia operacional dos agentes.
 - **Memória:** Salvar contexto em `.memory/session-context.json`.
 
 ### 2. Ready Gate e Kanban
-- **Repositório:** A Issue/card deve pertencer a `italomanzine/Alexandria-UFSC`.
-- **Projeto:** A Issue/card deve estar no Project `https://github.com/users/italomanzine/projects/3/views/1`.
+- **Repositório:** A Issue/card deve pertencer ao `productRepository`.
+- **Projeto:** A Issue/card deve estar no `projectUrl`.
 - **Gate:** `/intent` só pode iniciar se o campo `Status` estiver em `Ready`.
 - **Bloqueio:** Se o status for `Backlog`, `In progress`, `In review` ou qualquer outro, parar o fluxo e explicar o motivo.
 - **Transição:** Ao iniciar desenvolvimento, mover o card para `In progress`.
@@ -43,7 +43,7 @@ Este arquivo define a coreografia operacional dos agentes.
 ### 3. Disciplina de Branch
 - **Ação obrigatória:** Criar `feature/<slug>` a partir da `main`.
 - **Bloqueio:** Nunca commitar direto em `main` ou `master`.
-- **Repositório:** Branch e PR devem ser criados em `italomanzine/Alexandria-UFSC`, não no repo do harness.
+- **Repositório:** Branch e PR devem ser criados no `productRepository`, não no `harnessRepository`.
 
 ### 4. Planejamento Técnico
 - **Agente:** Architect.
@@ -66,7 +66,7 @@ Este arquivo define a coreografia operacional dos agentes.
 - **Quando:** Mudanças de frontend.
 - **Ferramentas:** Stitch MCP HTTP no servidor `stitch`, `.agents/skills/stitch-loop/SKILL.md`, `.agents/skills/design-md/SKILL.md`, `.agents/skills/enhance-prompt/SKILL.md`, `.agents/skills/ui-ux-pro-max/SKILL.md`.
 - **Configuração:** `.mcp.json` deve conter `mcpServers.stitch.type=http`, `url=https://stitch.googleapis.com/mcp` e header `X-Goog-Api-Key`.
-- **Protótipo:** Usar `https://stitch.withgoogle.com/projects/13111711788255953460?pli=1` e resource MCP `projects/13111711788255953460`.
+- **Protótipo:** Usar `defaultStitchProjectUrl` e `stitchProjectName` de `.harness/github-targets.json`.
 - **Fonte visual:** Usar `.stitch/DESIGN.md` como referência operacional real, não como exemplo.
 - **Browser principal:** `.agents/skills/playwright/SKILL.md` e Playwright MCP para jornadas, snapshots de DOM/acessibilidade e screenshots.
 - **Diagnóstico:** `.agents/skills/chrome-devtools/SKILL.md` e Chrome DevTools MCP para console, rede, traces e DOM ao vivo quando Playwright não explicar a falha.
@@ -87,7 +87,7 @@ Este arquivo define a coreografia operacional dos agentes.
 
 ### 9. Conclusão
 - **Ferramenta:** GitHub MCP.
-- **Ação:** Criar PR para `main` em `italomanzine/Alexandria-UFSC`, postar resumo, linkar card/spec/contrato e anexar evidências.
+- **Ação:** Criar PR para `main` no `productRepository`, postar resumo, linkar card/spec/contrato e anexar evidências.
 - **Kanban:** Após PR aberto, mover o card para `In review`.
 - **Validação humana:** Não mover automaticamente para concluído.
 - **Log:** Atualizar `.memory/progress.md` e `.memory/decision-log.md`.

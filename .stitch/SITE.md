@@ -14,4 +14,4 @@
 
 Use `.stitch/DESIGN.md` as the visual design source for `/refine` and `/intent` whenever a User Story includes UI/UX work.
 
-The implementation target remains `italomanzine/Alexandria-UFSC`. The harness repository stores only the operational reference.
+The implementation target comes from `.harness/github-targets.json`. In playground mode, this Stitch context is a read-only reference; participants should edit their own Stitch project and update the configured `defaultStitchProjectUrl` and `stitchProjectName`.

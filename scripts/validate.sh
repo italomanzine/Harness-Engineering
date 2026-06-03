@@ -10,6 +10,7 @@ required_files=(
   ".github/copilot-instructions.md"
   ".harness/workflow.md"
   ".harness/github-targets.json"
+  ".harness/github-targets.example.json"
   ".agents/roles/product_manager.md"
   ".agents/roles/orchestrator.md"
   ".agents/roles/architect.md"
@@ -107,39 +108,44 @@ if ! jq -e '.sensors.harness.command | length > 0' .harness/sensors.json >/dev/n
   exit 1
 fi
 
-if ! jq -e '.mcpServers.stitch.type == "http" and .mcpServers.stitch.url == "https://stitch.googleapis.com/mcp" and (.mcpServers.stitch.headers["X-Goog-Api-Key"] | length > 0)' .mcp.example.json >/dev/null; then
+if ! jq -e '.mcpServers.stitch.type == "http" and .mcpServers.stitch.url == "https://stitch.googleapis.com/mcp" and (.mcpServers.stitch.headers["X-Goog-Api-Key"] == "[SECRET]")' .mcp.example.json >/dev/null; then
   echo "MCP Stitch HTTP ausente ou mal configurado em .mcp.example.json."
   exit 1
 fi
 
-if ! jq -e '
-  .productRepository == "italomanzine/Alexandria-UFSC" and
-  .harnessRepository == "italomanzine/Harness-Engineering" and
-  .projectUrl == "https://github.com/users/italomanzine/projects/3/views/1" and
-  .defaultStitchProjectUrl == "https://stitch.withgoogle.com/projects/13111711788255953460?pli=1" and
-  .stitchProjectName == "projects/13111711788255953460" and
-  .kanban.statusField == "Status" and
-  .kanban.statuses.backlog == "Backlog" and
-  .kanban.statuses.ready == "Ready" and
-  .kanban.statuses.inProgress == "In progress" and
-  .kanban.statuses.inReview == "In review"
-' .harness/github-targets.json >/dev/null; then
-  echo "Targets GitHub/Kanban/Stitch ausentes ou incorretos em .harness/github-targets.json."
+for targets_file in ".harness/github-targets.json" ".harness/github-targets.example.json"; do
+  if ! jq -e '
+    .version == 1 and
+    (.productRepository | type == "string" and length > 0 and test("^[^/]+/[^/]+$")) and
+    (.harnessRepository | type == "string" and length > 0 and test("^[^/]+/[^/]+$")) and
+    .productRepository != .harnessRepository and
+    (.projectUrl | type == "string" and startswith("https://github.com/") and length > 0) and
+    (.defaultStitchProjectUrl | type == "string" and startswith("https://stitch.withgoogle.com/projects/") and length > 0) and
+    (.stitchProjectName | type == "string" and startswith("projects/") and length > 0) and
+    .kanban.statusField == "Status" and
+    .kanban.statuses.backlog == "Backlog" and
+    .kanban.statuses.ready == "Ready" and
+    .kanban.statuses.inProgress == "In progress" and
+    .kanban.statuses.inReview == "In review" and
+    (.rules | type == "array" and length >= 6)
+  ' "$targets_file" >/dev/null; then
+    echo "Targets GitHub/Kanban/Stitch ausentes ou incorretos em $targets_file."
+    exit 1
+  fi
+done
+
+if grep -R "X-Goog-Api-Key.*[A-Za-z0-9_-]\{24,\}" .mcp.example.json .harness/github-targets.example.json >/dev/null; then
+  echo "Possivel segredo real encontrado em arquivo example."
   exit 1
 fi
 
-if grep -R "Create product Issues/User Stories only in italomanzine/Harness-Engineering" .harness/github-targets.json >/dev/null; then
-  echo "Regra invalida: productRepository nao pode apontar para o repo do harness."
+if ! grep -R "productRepository" AGENTS.md README.md GEMINI.md .github/copilot-instructions.md .harness/workflow.md .agents/roles .github/prompts >/dev/null; then
+  echo "Referencia configuravel productRepository nao encontrada nos contratos principais."
   exit 1
 fi
 
-if ! grep -R "italomanzine/Alexandria-UFSC" AGENTS.md README.md GEMINI.md .github/copilot-instructions.md .harness/workflow.md .agents/roles .github/prompts >/dev/null; then
-  echo "Repositorio de produto italomanzine/Alexandria-UFSC nao encontrado nos contratos principais."
-  exit 1
-fi
-
-if ! grep -R "https://github.com/users/italomanzine/projects/3/views/1" AGENTS.md README.md GEMINI.md .github/copilot-instructions.md .harness/workflow.md .agents/roles .github/prompts >/dev/null; then
-  echo "GitHub Project 3 nao encontrado nos contratos principais."
+if ! grep -R "projectUrl" AGENTS.md README.md GEMINI.md .github/copilot-instructions.md .harness/workflow.md .agents/roles .github/prompts >/dev/null; then
+  echo "Referencia configuravel projectUrl nao encontrada nos contratos principais."
   exit 1
 fi
 
@@ -163,13 +169,13 @@ if ! grep -R "In review" AGENTS.md README.md GEMINI.md .harness/workflow.md .age
   exit 1
 fi
 
-if ! grep -R "https://stitch.withgoogle.com/projects/13111711788255953460?pli=1" AGENTS.md README.md GEMINI.md .github/copilot-instructions.md .harness/workflow.md .agents/roles .github/prompts .stitch >/dev/null; then
-  echo "URL real do prototipo Stitch nao encontrada nos contratos principais."
+if ! grep -R "defaultStitchProjectUrl" AGENTS.md README.md GEMINI.md .github/copilot-instructions.md .harness/workflow.md .github/prompts >/dev/null; then
+  echo "Referencia configuravel defaultStitchProjectUrl nao encontrada nos contratos principais."
   exit 1
 fi
 
-if ! grep -R "projects/13111711788255953460" AGENTS.md README.md GEMINI.md .github/copilot-instructions.md .harness/workflow.md .agents/roles .github/prompts .stitch >/dev/null; then
-  echo "Resource MCP real do Stitch nao encontrado nos contratos principais."
+if ! grep -R "stitchProjectName" AGENTS.md README.md GEMINI.md .github/copilot-instructions.md .harness/workflow.md .github/prompts >/dev/null; then
+  echo "Referencia configuravel stitchProjectName nao encontrada nos contratos principais."
   exit 1
 fi
 
