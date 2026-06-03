@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Harness Engineering</title>
+
+<!-- Inter -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Prism One Dark -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-one-dark.min.css" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#0a0a0f;
+  --acc1:#7c3aed;
+  --acc2:#06b6d4;
+  --alert:#f59e0b;
+  --ok:#10b981;
+  --txt:#e8e8f0;
+  --muted:#8b8b9e;
+  --card-bg:rgba(255,255,255,0.05);
+  --card-br:rgba(255,255,255,0.08);
+  --grad:linear-gradient(120deg,var(--acc1),var(--acc2));
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--bg);
+  color:var(--txt);
+  font-family:'Inter',system-ui,sans-serif;
+  font-weight:400;
+  line-height:1.5;
+  overflow:hidden;
+}
+
+/* noise overlay */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:9998;
+  pointer-events:none;
+  opacity:0.03;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+code,pre{font-family:'JetBrains Mono',ui-monospace,monospace}
+
+/* ===== DECK / SCROLL SNAP ===== */
+#deck{
+  position:relative;
+  z-index:1;
+  height:100vh;
+  overflow-y:scroll;
+  scroll-snap-type:y mandatory;
+  scrollbar-width:none;
+}
+#deck::-webkit-scrollbar{display:none}
+
+section{
+  scroll-snap-align:start;
+  min-height:100vh;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:64px 80px;
+  overflow:hidden;
+}
+
+.slide-inner{
+  width:100%;
+  max-width:1100px;
+  margin:0 auto;
+}
+
+/* eyebrow / number */
+.eyebrow{
+  font-size:0.8rem;
+  font-weight:700;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--acc2);
+  margin-bottom:18px;
+}
+
+h1{font-size:clamp(2.6rem,7vw,6rem);font-weight:900;line-height:1.02;letter-spacing:-0.03em}
+h2{font-size:clamp(1.9rem,4vw,3.2rem);font-weight:900;line-height:1.08;letter-spacing:-0.02em;margin-bottom:14px}
+h3{font-size:1.25rem;font-weight:700}
+p{color:var(--muted);font-size:1.05rem;max-width:62ch}
+.lead{font-size:clamp(1.05rem,2vw,1.35rem);color:var(--txt);opacity:.85}
+
+.grad-text{
+  background:linear-gradient(120deg,var(--acc1),var(--acc2),var(--acc1));
+  background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  animation:gradientShift 4s ease infinite;
+}
+
+/* ===== ANIMATION PRIMITIVES ===== */
+.anim,.anim-zoom,.anim-left,.anim-right{
+  opacity:0;
+  transition:opacity .6s ease,transform .6s ease;
+  transition-delay:calc(var(--i,0)*0.12s);
+}
+.anim{transform:translateY(30px)}
+.anim-zoom{transform:scale(.85)}
+.anim-left{transform:translateX(-40px)}
+.anim-right{transform:translateX(40px)}
+.anim.visible,.anim-zoom.visible,.anim-left.visible,.anim-right.visible{
+  opacity:1;transform:none;
+}
+
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes float{from{transform:translateY(-20px)}to{transform:translateY(20px)}}
+@keyframes blink{50%{opacity:0}}
+@keyframes dash{to{stroke-dashoffset:0}}
+@keyframes underlineGrad{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+
+/* ===== CAPA ===== */
+#circuit-bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+}
+#circuit-bg svg{position:absolute;inset:0;width:100%;height:100%}
+.trace{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.trace.t-dim{stroke:rgba(124,58,237,.07);stroke-width:1.1}
+.trace.t-mid{stroke:rgba(6,182,212,.16);stroke-width:1.4}
+.via{fill:#0a0a0f;stroke:rgba(6,182,212,.4);stroke-width:1.4}
+.via-core{fill:rgba(124,58,237,.6)}
+.flow{fill:none;stroke:#7df0ff;stroke-width:1.8;stroke-linecap:round}
+@keyframes flowMove{to{stroke-dashoffset:-100}}
+#s-capa h1{margin-bottom:24px}
+#s-capa .lead{max-width:46ch;margin:0 auto}
+#s-capa .slide-inner{text-align:center;position:relative;z-index:1}
+.scroll-hint{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);color:var(--muted);font-size:.8rem;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:2}
+.scroll-hint .mouse{width:24px;height:38px;border:2px solid var(--muted);border-radius:14px;position:relative}
+.scroll-hint .mouse::after{content:"";position:absolute;top:6px;left:50%;width:4px;height:7px;background:var(--muted);border-radius:2px;transform:translateX(-50%);animation:float 1.6s ease-in-out infinite alternate}
+
+/* ===== QUEM SOU ===== */
+.about{display:flex;gap:56px;align-items:center;flex-wrap:wrap;justify-content:center}
+@property --ring-ang{ syntax:'<angle>'; inherits:false; initial-value:0deg; }
+.about-photo{
+  width:240px;height:240px;border-radius:50%;object-fit:cover;object-position:50% 22%;flex-shrink:0;
+  padding:6px;
+  background:conic-gradient(from var(--ring-ang), var(--acc1), var(--acc2), var(--acc1), var(--acc2), var(--acc1));
+  box-shadow:0 0 0 5px rgba(124,58,237,.12), 0 24px 60px rgba(0,0,0,.5);
+  animation:ringSpin 14s linear infinite;
+}
+@keyframes ringSpin{ to{ --ring-ang:360deg; } }
+.about-info{max-width:440px}
+.about-info h2{margin-bottom:6px}
+.about-role{color:var(--acc2);font-weight:700;font-size:1.1rem;margin-bottom:18px}
+.about-bio{margin-bottom:24px}
+.socials{display:flex;gap:14px}
+.socials a{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 18px;border-radius:12px;
+  background:var(--card-bg);border:1px solid var(--card-br);
+  color:var(--txt);text-decoration:none;font-weight:700;font-size:.95rem;
+  transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
+}
+.socials a:hover{transform:translateY(-4px) scale(1.02);border-color:var(--acc2);box-shadow:0 14px 30px rgba(6,182,212,.2)}
+.socials svg{width:20px;height:20px}
+
+/* ===== FRASE EFEITO ===== */
+#s-frase .slide-inner{text-align:center}
+.quote{font-size:clamp(2rem,5.5vw,4.2rem);font-weight:900;line-height:1.15;letter-spacing:-0.02em}
+.quote .hl{position:relative;white-space:nowrap}
+.quote .hl::after{
+  content:"";position:absolute;left:0;right:0;bottom:-.08em;height:.12em;border-radius:4px;
+  background:linear-gradient(90deg,var(--acc1),var(--acc2),var(--acc1));
+  background-size:200% 100%;animation:underlineGrad 3s linear infinite;
+}
+
+/* ===== TIMELINE (horizontal) ===== */
+.timeline{position:relative;display:flex;width:100%;height:340px;margin:40px auto 0}
+.timeline::before{content:"";position:absolute;top:50%;left:0;right:0;height:2px;transform:translateY(-50%);background:linear-gradient(90deg,transparent 1%,var(--acc1) 12%,var(--acc2) 88%,transparent 99%)}
+.tl-item{position:relative;flex:1}
+.tl-dot{position:absolute;top:50%;left:50%;width:16px;height:16px;border-radius:50%;transform:translate(-50%,-50%);background:var(--grad);box-shadow:0 0 0 4px var(--bg),0 0 16px var(--acc2);z-index:2}
+.tl-stem{position:absolute;left:50%;width:2px;transform:translateX(-50%);background:rgba(255,255,255,.18)}
+.tl-content{position:absolute;left:50%;transform:translateX(-50%);width:150px;text-align:center}
+.tl-item:nth-child(odd) .tl-content{bottom:calc(50% + 34px)}
+.tl-item:nth-child(odd) .tl-stem{bottom:50%;height:34px}
+.tl-item:nth-child(even) .tl-content{top:calc(50% + 34px)}
+.tl-item:nth-child(even) .tl-stem{top:50%;height:34px}
+.tl-date{font-weight:900;font-size:1rem;color:var(--acc2);margin-bottom:4px}
+.tl-text{color:var(--muted);font-size:.84rem;line-height:1.35}
+.tl-item.last .tl-date{color:var(--acc1)}
+
+/* ===== CARDS GRID ===== */
+.grid{display:grid;gap:22px;width:100%}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+
+.card{
+  position:relative;
+  background:var(--card-bg);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--card-br);
+  border-radius:16px;
+  padding:26px 24px;
+  transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease;
+  overflow:hidden;
+}
+.card:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 22px 50px rgba(0,0,0,.45);border-color:rgba(124,58,237,.4)}
+.card h3{margin-bottom:8px}
+.card p{font-size:.92rem}
+
+/* maturity */
+.lvl{border-top:4px solid var(--lvl,#555)}
+.lvl .watermark{position:absolute;top:-18px;right:6px;font-size:6rem;font-weight:900;color:rgba(255,255,255,.05);line-height:1}
+.lvl .lvl-tag{font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--lvl);margin-bottom:6px}
+
+/* code sections */
+.code-wrap{display:grid;grid-template-columns:1fr 1.15fr;gap:40px;align-items:center;width:100%}
+.code-def h2{margin-bottom:14px}
+.code-def .badge{display:inline-block;padding:5px 12px;border-radius:999px;background:rgba(124,58,237,.18);color:#c4b5fd;font-size:.8rem;font-weight:700;margin-bottom:16px;border:1px solid rgba(124,58,237,.35)}
+pre[class*="language-"]{
+  border-radius:14px;border:1px solid var(--card-br);
+  box-shadow:0 20px 50px rgba(0,0,0,.5);
+  font-size:.84rem;line-height:1.55;margin:0;max-height:62vh;
+}
+.code-head{
+  display:flex;align-items:center;gap:8px;padding:10px 16px;
+  background:#21252b;border:1px solid var(--card-br);border-bottom:none;
+  border-radius:14px 14px 0 0;font-size:.8rem;color:var(--muted);font-family:'JetBrains Mono',monospace;
+}
+.code-head .dot{width:11px;height:11px;border-radius:50%}
+.code-head .r{background:#ff5f56}.code-head .y{background:#ffbd2e}.code-head .g{background:#27c93f}
+.code-head .fname{margin-left:8px}
+.code-wrap pre[class*="language-"]{border-radius:0 0 14px 14px}
+.cursor{display:inline-block;width:8px;background:var(--acc2);margin-left:1px;animation:blink 1s step-end infinite}
+
+/* TDD/BDD/SDD */
+.tri h3{font-size:2rem;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.tri .sub{font-size:.82rem;color:var(--muted);margin-bottom:14px;display:block}
+.tri pre[class*="language-"]{font-size:.74rem;max-height:none}
+
+/* problemática */
+.prob{border-left:4px solid var(--alert)}
+.prob h3{color:var(--alert);display:flex;align-items:center;gap:10px}
+
+/* diagrama / solução */
+.diagram{width:100%;max-width:920px;margin:20px auto 0}
+.diagram svg{width:100%;height:auto}
+.flow-legend{display:flex;gap:30px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+.flow-legend span{display:inline-flex;align-items:center;gap:8px;font-size:.95rem;font-weight:700}
+.flow-legend .swatch{width:16px;height:16px;border-radius:4px}
+
+/* como trabalhar */
+.work .num{font-size:.85rem;font-weight:900;color:var(--acc2);margin-bottom:10px}
+.work .ico{width:42px;height:42px;margin-bottom:14px;color:var(--acc2)}
+
+/* links / qr */
+.qr-row{display:flex;gap:48px;justify-content:center;flex-wrap:wrap}
+.qr-card{text-align:center;padding:30px}
+.qr-card .qrbox{background:#fff;padding:14px;border-radius:14px;display:inline-block;margin-bottom:16px}
+.qr-card .qrbox canvas,.qr-card .qrbox img{display:block}
+.qr-card h3{display:flex;align-items:center;gap:10px;justify-content:center}
+.qr-card a{color:var(--acc2);text-decoration:none;font-size:.88rem;word-break:break-all}
+.qr-card svg{width:22px;height:22px}
+
+/* bônus */
+.bonus-list{display:flex;flex-direction:column;gap:16px;width:100%;max-width:720px;margin:0 auto}
+.bonus-item{
+  display:flex;align-items:center;gap:18px;text-decoration:none;color:var(--txt);
+  background:var(--card-bg);border:1px solid var(--card-br);border-radius:14px;padding:18px 24px;
+  transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease;cursor:pointer;
+  font:inherit;width:100%;text-align:left;
+}
+.bonus-item:hover{transform:translateX(8px);border-color:var(--acc2);box-shadow:0 14px 34px rgba(6,182,212,.18)}
+.bonus-item .bi-ico{font-size:1.6rem;flex-shrink:0}
+.bonus-item .bi-title{font-weight:700;font-size:1.05rem}
+.bonus-item .bi-desc{color:var(--muted);font-size:.86rem}
+.bonus-item .bi-arrow{margin-left:auto;color:var(--acc2);font-size:1.3rem}
+
+/* footer source */
+.source{position:absolute;bottom:22px;left:0;right:0;text-align:center;font-size:.78rem}
+.source a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.source a:hover{color:var(--acc2);border-color:var(--acc2)}
+
+/* ===== DOTS NAV ===== */
+#dots{position:fixed;right:26px;top:50%;transform:translateY(-50%);z-index:9999;display:flex;flex-direction:column;gap:11px}
+#dots button{
+  width:11px;height:11px;border-radius:50%;border:none;cursor:pointer;padding:0;
+  background:rgba(255,255,255,.22);transition:all .3s ease;
+}
+#dots button:hover{background:rgba(255,255,255,.5);transform:scale(1.25)}
+#dots button.active{background:var(--grad);box-shadow:0 0 12px var(--acc2);transform:scale(1.35)}
+body.presenting .scroll-hint{display:none}
+body.presenting #dots{opacity:.3}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:768px){
+  section{padding:56px 22px}
+  #dots{right:12px;gap:8px}
+  .code-wrap{grid-template-columns:1fr;gap:22px}
+  .grid-4,.grid-3,.grid-2{grid-template-columns:1fr}
+  .timeline{flex-direction:column;height:auto;gap:6px}
+  .timeline::before{top:0;bottom:0;left:7px;right:auto;width:2px;height:auto;background:linear-gradient(180deg,var(--acc1),var(--acc2))}
+  .tl-item{width:100%;padding:10px 0 10px 34px}
+  .tl-dot{top:18px;left:7px;transform:translate(-50%,0)}
+  .tl-stem{display:none}
+  .tl-content{position:static;transform:none;width:auto;text-align:left}
+  .about{flex-direction:column;text-align:center}
+  .socials{justify-content:center}
+  pre[class*="language-"]{max-height:48vh}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .anim,.anim-zoom,.anim-left,.anim-right{transition:none;opacity:1;transform:none}
+  .grad-text,.quote .hl::after,.flow,.about-photo{animation:none}
+  #deck{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<nav id="dots" aria-label="Navegação de slides"></nav>
+
+<div id="circuit-bg" aria-hidden="true"></div>
+
+<div id="deck">
+
+  <!-- 1. CAPA -->
+  <section id="s-capa" data-title="Capa">
+    <div class="slide-inner">
+      <h1 class="anim grad-text">Harness Engineering</h1>
+      <p class="lead anim" style="--i:1">Construindo software com IA: menos hype, mais arquitetura, segurança e resultado.</p>
+    </div>
+  </section>
+
+  <!-- 2. QUEM SOU -->
+  <section id="s-quem" data-title="Quem sou">
+    <div class="slide-inner">
+      <div class="about">
+        <img class="about-photo anim-zoom" src="../assets/foto-perfil.jpeg" alt="Ítalo Manzine">
+        <div class="about-info">
+          <p class="eyebrow anim" style="--i:1">Quem eu sou</p>
+          <h2 class="anim" style="--i:1">Ítalo Manzine</h2>
+          <div class="about-role anim" style="--i:2">Engenheiro de Software - DTI Digital <br>Ex-Atleta Olímpico, Administrador de Empresas e Engenheiro de Computação pela UFSC</br></div>
+          <div class="socials anim" style="--i:4">
+            <a href="https://linkedin.com/in/italomanzine" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.2 8.2h4.6V24H.2V8.2zm7.5 0h4.4v2.16h.06c.61-1.16 2.1-2.38 4.32-2.38 4.62 0 5.48 3.04 5.48 7V24h-4.6v-6.99c0-1.67-.03-3.82-2.33-3.82-2.33 0-2.69 1.82-2.69 3.7V24h-4.6V8.2z"/></svg>
+              LinkedIn
+            </a>
+            <a href="https://instagram.com/italomanzine" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.43.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.43.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.43-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.43-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zm0 1.62c-3.15 0-3.52.01-4.76.07-.97.04-1.5.21-1.85.34-.46.18-.8.4-1.15.74-.34.35-.56.69-.74 1.15-.13.35-.3.88-.34 1.85-.06 1.24-.07 1.61-.07 4.76s.01 3.52.07 4.76c.04.97.21 1.5.34 1.85.18.46.4.8.74 1.15.35.34.69.56 1.15.74.35.13.88.3 1.85.34 1.24.06 1.61.07 4.76.07s3.52-.01 4.76-.07c.97-.04 1.5-.21 1.85-.34.46-.18.8-.4 1.15-.74.34-.35.56-.69.74-1.15.13-.35.3-.88.34-1.85.06-1.24.07-1.61.07-4.76s-.01-3.52-.07-4.76c-.04-.97-.21-1.5-.34-1.85-.18-.46-.4-.8-.74-1.15-.35-.34-.69-.56-1.15-.74-.35-.13-.88-.3-1.85-.34-1.24-.06-1.61-.07-4.76-.07zm0 2.76a5.46 5.46 0 110 10.92 5.46 5.46 0 010-10.92zm0 1.62a3.84 3.84 0 100 7.68 3.84 3.84 0 000-7.68zm5.66-2.91a1.28 1.28 0 110 2.56 1.28 1.28 0 010-2.56z"/></svg>
+              Instagram
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. FRASE EFEITO -->
+  <section id="s-frase" data-title="Frase de efeito">
+    <div class="slide-inner">
+      <p class="quote anim-zoom">Código/Prompt é <em style="font-style:normal;color:var(--muted)">commodity</em>.<br>Especificar bem é <span class="hl grad-text">engenharia</span>.</p>
+    </div>
+  </section>
+
+  <!-- 4. CONTEXTO HISTÓRICO -->
+  <section id="s-historia" data-title="Contexto histórico">
+    <div class="slide-inner">
+      <p class="eyebrow anim">Contexto histórico</p>
+      <h2 class="anim">Do ChatGPT ao Harness Engineering</h2>
+      <div class="timeline">
+        <div class="tl-item anim" style="--i:0"><span class="tl-stem"></span><span class="tl-dot"></span><div class="tl-content"><div class="tl-date">Nov 2022</div><div class="tl-text">ChatGPT lançado — LLM vira produto de massa</div></div></div>
+        <div class="tl-item anim" style="--i:1"><span class="tl-stem"></span><span class="tl-dot"></span><div class="tl-content"><div class="tl-date">2023</div><div class="tl-text">Prompt Engineering — Chain-of-Thought, ReAct</div></div></div>
+        <div class="tl-item anim" style="--i:2"><span class="tl-stem"></span><span class="tl-dot"></span><div class="tl-content"><div class="tl-date">2024</div><div class="tl-text">Agentes — LLMs usam ferramentas e agem no mundo</div></div></div>
+        <div class="tl-item anim" style="--i:3"><span class="tl-stem"></span><span class="tl-dot"></span><div class="tl-content"><div class="tl-date">Nov 2024</div><div class="tl-text">MCP — padrão para conectar agentes a ferramentas</div></div></div>
+        <div class="tl-item anim" style="--i:4"><span class="tl-stem"></span><span class="tl-dot"></span><div class="tl-content"><div class="tl-date">2025</div><div class="tl-text">Context Engineering + Skills — RAG, comportamentos reutilizáveis</div></div></div>
+        <div class="tl-item anim" style="--i:5"><span class="tl-stem"></span><span class="tl-dot"></span><div class="tl-content"><div class="tl-date">Mid 2025</div><div class="tl-text">SDD — spec completa antes do código</div></div></div>
+        <div class="tl-item anim last" style="--i:6"><span class="tl-stem"></span><span class="tl-dot"></span><div class="tl-content"><div class="tl-date">Fev 2026+</div><div class="tl-text">Harness Engineering — rédeas no agente: restrições e feedback loops</div></div></div>
+      </div>
+    </div>
+    <footer class="source">Fontes:
+      <a href="https://openai.com/index/chatgpt/" target="_blank" rel="noopener">ChatGPT (OpenAI)</a> ·
+      <a href="https://arxiv.org/abs/2201.11903" target="_blank" rel="noopener">Chain-of-Thought (Wei et al., 2022)</a> ·
+      <a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">ReAct (Yao et al., 2022)</a> ·
+      <a href="https://www.anthropic.com/news/model-context-protocol" target="_blank" rel="noopener">MCP (Anthropic, 2024)</a>
+    </footer>
+  </section>
+
+  <!-- 5. NÍVEIS DE MATURIDADE -->
+  <section id="s-niveis" data-title="Níveis de maturidade">
+    <div class="slide-inner">
+      <p class="eyebrow anim">Maturidade</p>
+      <h2 class="anim">Níveis do uso de IA em Desenvolvimento</h2>
+      <div class="grid grid-4" style="margin-top:30px">
+        <div class="card lvl anim" style="--i:0;--lvl:#6b7280"><div class="watermark">1</div><div class="lvl-tag">Nível 1</div><h3>Ad-hoc</h3><p>Copiar/colar trechos em chats externos. Contexto fragmentado, risco de alucinação, zero governança.</p></div>
+        <div class="card lvl anim" style="--i:1;--lvl:#0ea5e9"><div class="watermark">2</div><div class="lvl-tag">Nível 2</div><h3>Assistentes Inline</h3><p>Autocomplete na IDE (Copilot). Foco em velocidade de digitação, sem visão estrutural.</p></div>
+        <div class="card lvl anim" style="--i:2;--lvl:#7c3aed"><div class="watermark">3</div><div class="lvl-tag">Nível 3</div><h3>Agentes e Protocolos</h3><p>Lê múltiplos arquivos, executa comandos, usa skills e MCP. Autonomia monitorada, mas reativa.</p></div>
+        <div class="card lvl anim" style="--i:3;--lvl:#10b981"><div class="watermark">4</div><div class="lvl-tag">Nível 4</div><h3>Harness Engineering</h3><p>IA sitiada por testes, specs estritas e verificadores. Loops fechados e autônomos de correção.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. AGENTES -->
+  <section id="s-agentes" data-title="Agentes">
+    <div class="slide-inner">
+      <div class="code-wrap">
+        <div class="code-def">
+          <span class="badge anim" style="--i:1">Agents</span>
+          <h2 class="anim" style="--i:1">Agentes</h2>
+          <p class="anim" style="--i:2">LLM com autonomia para planejar, usar ferramentas e executar tarefas sem intervenção humana contínua. Você define o <strong>"o quê"</strong>; o agente descobre o <strong>"como"</strong>.</p>
+        </div>
+        <div class="anim-right" style="--i:1">
+          <div class="code-head"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="fname">.agents/roles/architect.md</span></div>
+          <pre><code class="language-markdown" data-code="# ROLE: &lt;nome do agente&gt;
+# CONTEXT: &lt;domínio de atuação&gt;
+
+## CORE MISSION
+&lt;Objetivo principal em 1 parágrafo&gt;
+
+## OPERATING PRINCIPLES
+1. **&lt;Princípio&gt;:** &lt;descrição&gt;
+2. **&lt;Princípio&gt;:** &lt;descrição&gt;
+
+## ENTREGÁVEIS
+- `specs/&lt;slug&gt;/plan.md`
+- `specs/&lt;slug&gt;/evaluation-contract.json`
+
+## CONSTRAINTS
+- Não implementa código diretamente
+- Só age após ler a spec completa"></code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. HABILIDADES -->
+  <section id="s-skills" data-title="Habilidades">
+    <div class="slide-inner">
+      <div class="code-wrap">
+        <div class="code-def">
+          <span class="badge anim" style="--i:1">Skills</span>
+          <h2 class="anim" style="--i:1">Habilidades</h2>
+          <p class="anim" style="--i:2">Capacidades modulares e reutilizáveis que estendem o agente. Carregadas sob demanda — cada skill encapsula instruções, contexto e recursos para um domínio específico.</p>
+        </div>
+        <div class="anim-right" style="--i:1">
+          <div class="code-head"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="fname">.agents/skills/&lt;skill&gt;/SKILL.md</span></div>
+          <pre><code class="language-yaml" data-code="---
+name: &lt;nome-da-skill&gt;
+description: &lt;o que essa skill ensina ao agente&gt;
+allowed-tools:
+  - &quot;ferramenta-a:*&quot;
+  - &quot;ferramenta-b:*&quot;
+---
+
+# &lt;Nome da Skill&gt;
+
+## Trigger
+&lt;Quando o agente deve ativar esta skill&gt;
+
+## Steps
+1. &lt;passo 1&gt;
+2. &lt;passo 2&gt;
+3. &lt;passo 3&gt;
+
+## Output
+&lt;O que o agente deve produzir ao final&gt;"></code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. MCP -->
+  <section id="s-mcp" data-title="MCP">
+    <div class="slide-inner">
+      <div class="code-wrap">
+        <div class="code-def">
+          <span class="badge anim" style="--i:1">Model Context Protocol</span>
+          <h2 class="anim" style="--i:1">MCP</h2>
+          <p class="anim" style="--i:2">Padrão aberto (Anthropic, Nov 2024) para conectar agentes a ferramentas e fontes de dados externas.</p>
+        </div>
+        <div class="anim-right" style="--i:1">
+          <div class="code-head"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="fname">.mcp.json</span></div>
+          <pre><code class="language-json" data-code="{
+  &quot;mcpServers&quot;: {
+    &quot;&lt;nome-do-servidor&gt;&quot;: {
+      &quot;type&quot;: &quot;http&quot;,
+      &quot;url&quot;: &quot;https://&lt;endpoint&gt;/mcp&quot;,
+      &quot;headers&quot;: { &quot;Authorization&quot;: &quot;Bearer &lt;TOKEN&gt;&quot; }
+    },
+    &quot;&lt;cli-tool&gt;&quot;: {
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;&lt;pacote&gt;@latest&quot;, &quot;--flag=valor&quot;]
+    }
+  }
+}"></code></pre>
+        </div>
+      </div>
+    </div>
+    <footer class="source"><a href="https://www.anthropic.com/news/model-context-protocol" target="_blank" rel="noopener">Fonte: Introducing the Model Context Protocol — Anthropic (nov. 2024)</a></footer>
+  </section>
+
+  <!-- 9. TDD + BDD + SDD -->
+  <section id="s-driven" data-title="TDD + BDD + SDD">
+    <div class="slide-inner">
+      <p class="eyebrow anim">Spec como contrato</p>
+      <h2 class="anim">TDD + BDD + SDD</h2>
+      <div class="grid grid-3 tri" style="margin-top:30px">
+        <div class="card anim" style="--i:0">
+          <h3>TDD</h3><span class="sub">Test Driven Development</span>
+          <p style="margin-bottom:14px">Escreva o teste antes da implementação — spec no nível unitário.</p>
+          <pre><code class="language-javascript">test('soma', () =&gt; {
+  expect(soma(2,3)).toBe(5);
+});</code></pre>
+        </div>
+        <div class="card anim" style="--i:1">
+          <h3>BDD</h3><span class="sub">Behavior Driven Development</span>
+          <p style="margin-bottom:14px">Descreva o comportamento em linguagem de negócio antes de implementar.</p>
+          <pre><code class="language-gherkin">Dado um carrinho vazio
+Quando adiciono 1 item
+Então o total é 1</code></pre>
+        </div>
+        <div class="card anim" style="--i:2">
+          <h3>SDD</h3><span class="sub">Spec Driven Development</span>
+          <p style="margin-bottom:14px">Escreva a spec completa antes do código — vira contrato.</p>
+          <pre><code class="language-markdown"># Spec: Checkout
+## Requisitos
+- REQ-001 ...
+## Arquitetura
+- ...</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. O QUE É HARNESS -->
+  <section id="s-oque" data-title="O que é Harness Engineering">
+    <div class="slide-inner" style="text-align:center">
+      <h2 class="anim">O que é Harness Engineering</h2>
+      <p class="lead anim" style="--i:1;margin:18px auto 0;max-width:60ch">É a disciplina de engenharia de software responsável por construir e manter os <span class="grad-text">arreios</span> do desenvolvimento.</p>
+    </div>
+  </section>
+
+  <!-- 11. PROBLEMÁTICA -->
+  <section id="s-problema" data-title="Problemática">
+    <div class="slide-inner">
+      <p class="eyebrow anim" style="color:var(--alert)">O problema</p>
+      <h2 class="anim">Agentes que não são confiáveis</h2>
+      <div class="grid grid-3" style="margin-top:30px">
+        <div class="card prob anim" style="--i:0"><h3>One Shot Hero</h3><p>Tenta fazer tudo de uma vez e perde o contexto.</p></div>
+        <div class="card prob anim" style="--i:1"><h3>Vitória Prematura</h3><p>Declara a tarefa pronta, mesmo incompleta.</p></div>
+        <div class="card prob anim" style="--i:2"><h3>Amnésia entre Sessões</h3><p>Perda de contexto e memória entre execuções.</p></div>
+        <div class="card prob anim" style="--i:3"><h3>Falta de Validação Real</h3><p>Marca features prontas sem testes ou lint executados por sensores externos.</p></div>
+        <div class="card prob anim" style="--i:4"><h3>Slope Acumulado</h3><p>Degradação gradual: mesmo compilando, acumula dívida técnica e viola a arquitetura.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. A SOLUÇÃO -->
+  <section id="s-solucao" data-title="A solução">
+    <div class="slide-inner" style="text-align:center">
+      <h2 class="anim">Harness Engineering: rédeas no agente</h2>
+      <div class="diagram anim-zoom" style="--i:1">
+        <svg viewBox="0 0 960 500" role="img" aria-label="Diagrama do harness: feed forward, modelo, sensores e loop de feedback">
+          <defs>
+            <marker id="mg" markerWidth="10" markerHeight="10" refX="8" refY="3.5" orient="auto"><path d="M0,0 L9,3.5 L0,7 Z" fill="#34d399"/></marker>
+            <marker id="mc" markerWidth="10" markerHeight="10" refX="8" refY="3.5" orient="auto"><path d="M0,0 L9,3.5 L0,7 Z" fill="#06b6d4"/></marker>
+            <marker id="mo" markerWidth="10" markerHeight="10" refX="8" refY="3.5" orient="auto"><path d="M0,0 L9,3.5 L0,7 Z" fill="#f59e0b"/></marker>
+            <linearGradient id="gmodel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c3aed"/><stop offset="1" stop-color="#06b6d4"/></linearGradient>
+          </defs>
+
+          <!-- container -->
+          <rect x="8" y="8" width="944" height="484" rx="22" fill="rgba(124,58,237,.04)" stroke="rgba(124,58,237,.4)" stroke-width="1.5" stroke-dasharray="3 5"/>
+          <text x="30" y="40" font-family="Inter" font-size="13" font-weight="700" fill="#8b8b9e" letter-spacing="2">HARNESS · TODO O RESTO</text>
+
+          <!-- ===== FEED FORWARD (esquerda, verde) ===== -->
+          <g font-family="Inter" font-size="13" font-weight="700" fill="#d1fae5" text-anchor="middle">
+            <rect x="44" y="86"  width="176" height="44" rx="10" fill="rgba(52,211,153,.12)" stroke="#34d399"/><text x="132" y="113">AGENTS.md</text>
+            <rect x="44" y="146" width="176" height="44" rx="10" fill="rgba(52,211,153,.12)" stroke="#34d399"/><text x="132" y="173">Spec / Tasks</text>
+            <rect x="44" y="206" width="176" height="44" rx="10" fill="rgba(52,211,153,.12)" stroke="#34d399"/><text x="132" y="233">Arquitetura docs</text>
+            <rect x="44" y="266" width="176" height="44" rx="10" fill="rgba(52,211,153,.12)" stroke="#34d399"/><text x="132" y="293">Convenções</text>
+          </g>
+          <text x="132" y="350" font-family="Inter" font-size="13" font-weight="700" fill="#34d399" text-anchor="middle">FEED FORWARD</text>
+          <text x="132" y="368" font-family="Inter" font-size="11" fill="#8b8b9e" text-anchor="middle">instruções preventivas</text>
+          <!-- rail + stubs + arrow to model -->
+          <line x1="232" y1="108" x2="232" y2="288" stroke="rgba(52,211,153,.5)" stroke-width="1.5"/>
+          <g stroke="rgba(52,211,153,.5)" stroke-width="1.5"><line x1="220" y1="108" x2="232" y2="108"/><line x1="220" y1="168" x2="232" y2="168"/><line x1="220" y1="228" x2="232" y2="228"/><line x1="220" y1="288" x2="232" y2="288"/></g>
+          <path d="M232,198 L386,198" fill="none" stroke="#34d399" stroke-width="2.5" marker-end="url(#mg)"/>
+
+          <!-- ===== MODEL (centro) ===== -->
+          <rect x="392" y="168" width="176" height="120" rx="18" fill="url(#gmodel)"/>
+          <text x="480" y="222" font-family="Inter" font-size="22" font-weight="900" fill="#fff" text-anchor="middle">MODEL</text>
+          <text x="480" y="250" font-family="Inter" font-size="12" fill="rgba(255,255,255,.85)" text-anchor="middle">Claude · GPT · etc</text>
+
+          <!-- ===== SENSORS (direita, laranja) ===== -->
+          <g font-family="Inter" font-size="13" font-weight="700" fill="#fef3c7" text-anchor="middle">
+            <rect x="740" y="86"  width="176" height="44" rx="10" fill="rgba(245,158,11,.12)" stroke="#f59e0b"/><text x="828" y="113">Linters</text>
+            <rect x="740" y="146" width="176" height="44" rx="10" fill="rgba(245,158,11,.12)" stroke="#f59e0b"/><text x="828" y="173">Type checkers</text>
+            <rect x="740" y="206" width="176" height="44" rx="10" fill="rgba(245,158,11,.12)" stroke="#f59e0b"/><text x="828" y="233">Testes / E2E</text>
+            <rect x="740" y="266" width="176" height="44" rx="10" fill="rgba(245,158,11,.12)" stroke="#f59e0b"/><text x="828" y="293">Review agent</text>
+          </g>
+          <text x="828" y="350" font-family="Inter" font-size="13" font-weight="700" fill="#f59e0b" text-anchor="middle">FEEDBACK</text>
+          <text x="828" y="368" font-family="Inter" font-size="11" fill="#8b8b9e" text-anchor="middle">sensores externos</text>
+          <line x1="728" y1="108" x2="728" y2="288" stroke="rgba(245,158,11,.5)" stroke-width="1.5"/>
+          <g stroke="rgba(245,158,11,.5)" stroke-width="1.5"><line x1="728" y1="108" x2="740" y2="108"/><line x1="728" y1="168" x2="740" y2="168"/><line x1="728" y1="228" x2="740" y2="228"/><line x1="728" y1="288" x2="740" y2="288"/></g>
+
+          <!-- ===== LOOP model <-> sensors ===== -->
+          <!-- saída: model -> sensors (cyan) -->
+          <path d="M568,202 L726,202" fill="none" stroke="#06b6d4" stroke-width="2.5" marker-end="url(#mc)"/>
+          <text x="647" y="192" font-family="Inter" font-size="11" font-weight="700" fill="#06b6d4" text-anchor="middle">gera código</text>
+          <!-- feedback: sensors -> model (laranja, tracejado) -->
+          <path d="M728,250 L570,250" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#mo)"/>
+          <text x="649" y="270" font-family="Inter" font-size="11" font-weight="700" fill="#f59e0b" text-anchor="middle">PASS / FAIL (0 ou 1)</text>
+
+          <!-- ===== MEMÓRIA + BOOTSTRAP (base, cyan) ===== -->
+          <g font-family="Inter" font-size="12" font-weight="700" fill="#cffafe" text-anchor="middle">
+            <rect x="258" y="396" width="140" height="42" rx="10" fill="rgba(6,182,212,.1)" stroke="#06b6d4"/><text x="328" y="422">init.sh</text>
+            <rect x="410" y="396" width="140" height="42" rx="10" fill="rgba(6,182,212,.1)" stroke="#06b6d4"/><text x="480" y="422">progress.md</text>
+            <rect x="562" y="396" width="140" height="42" rx="10" fill="rgba(6,182,212,.1)" stroke="#06b6d4"/><text x="632" y="422">git discipline</text>
+          </g>
+          <text x="480" y="466" font-family="Inter" font-size="12" font-weight="700" fill="#06b6d4" text-anchor="middle">MEMÓRIA + BOOTSTRAP</text>
+          <!-- support arrow memory -> model -->
+          <path d="M480,396 L480,292" fill="none" stroke="rgba(6,182,212,.55)" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#mc)"/>
+        </svg>
+      </div>
+      <div class="flow-legend anim" style="--i:2">
+        <span><span class="swatch" style="background:#34d399"></span>Feed Forward — specs, guias e convenções (preventivo)</span>
+        <span><span class="swatch" style="background:#f59e0b"></span>Feedback — sensores corrigem o modelo em loop</span>
+      </div>
+    </div>
+    <footer class="source"><a href="https://www.youtube.com/watch?v=dLs-Pbn8stU" target="_blank" rel="noopener">Fonte: Spec Driven chegou no limite — Harness Engineering é o próximo passo (YouTube)</a></footer>
+  </section>
+
+  <!-- 13. COMO TRABALHAR -->
+  <section id="s-como" data-title="Como trabalhar">
+    <div class="slide-inner">
+      <p class="eyebrow anim">Prática</p>
+      <h2 class="anim">Como trabalhar com Harness</h2>
+      <div class="grid grid-4 work" style="margin-top:30px">
+        <div class="card anim" style="--i:0">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M9 6h6a3 3 0 013 3v6"/></svg>
+          <div class="num">01</div><h3>Orquestração de Agentes</h3><p>Separe responsabilidades: um agente implementa, outro valida/testa. Nunca um só para tudo.</p>
+        </div>
+        <div class="card anim" style="--i:1">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          <div class="num">02</div><h3>Contratos</h3><p>O agente define uma lista de tarefas (o contrato) validada antes da execução. Evita loops infinitos.</p>
+        </div>
+        <div class="card anim" style="--i:2">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4"/><circle cx="12" cy="12" r="3"/></svg>
+          <div class="num">03</div><h3>Sensores Externos</h3><p>Qualidade julgada por ferramentas determinísticas (testes, lint), não pela LLM. Resultado binário 0/1.</p>
+        </div>
+        <div class="card anim" style="--i:3">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-9-9c2.5 0 4.8 1 6.4 2.6L21 8"/><path d="M21 3v5h-5"/></svg>
+          <div class="num">04</div><h3>Progresso e Contexto</h3><p>Arquivos de progress e scripts de bootstrap mantêm o estado e evitam amnésia entre sessões.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14. LINKS -->
+  <section id="s-links" data-title="Links">
+    <div class="slide-inner" style="text-align:center">
+      <p class="eyebrow anim">Conecte-se</p>
+      <h2 class="anim">Repositório &amp; Perfil</h2>
+      <div class="qr-row" style="margin-top:34px">
+        <div class="qr-card card anim-zoom" style="--i:0">
+          <div class="qrbox" id="qr-gh"></div>
+          <h3>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.4-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 016 0C17 4.6 18 4.9 18 4.9c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+            GitHub
+          </h3>
+          <a href="https://github.com/italomanzine/Harness-Engineering" target="_blank" rel="noopener">github.com/italomanzine/Harness-Engineering</a>
+        </div>
+        <div class="qr-card card anim-zoom" style="--i:1">
+          <div class="qrbox" id="qr-li"></div>
+          <h3>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.2 8.2h4.6V24H.2V8.2zm7.5 0h4.4v2.16h.06c.61-1.16 2.1-2.38 4.32-2.38 4.62 0 5.48 3.04 5.48 7V24h-4.6v-6.99c0-1.67-.03-3.82-2.33-3.82-2.33 0-2.69 1.82-2.69 3.7V24h-4.6V8.2z"/></svg>
+            LinkedIn
+          </h3>
+          <a href="https://linkedin.com/in/italomanzine" target="_blank" rel="noopener">linkedin.com/in/italomanzine</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15. BÔNUS -->
+  <section id="s-bonus" data-title="Bônus">
+    <div class="slide-inner">
+      <p class="eyebrow anim">Bônus</p>
+      <h2 class="anim">Recursos para ir além</h2>
+      <div class="bonus-list" style="margin-top:24px">
+        <a class="bonus-item anim" style="--i:0" href="https://www.skills.sh" target="_blank" rel="noopener"><span><span class="bi-title">skills.sh</span><br><span class="bi-desc">Compilado de skills para agentes</span></span><span class="bi-arrow">→</span></a>
+        <a class="bonus-item anim" style="--i:1" href="https://github.com/github/spec-kit" target="_blank" rel="noopener"><span><span class="bi-title">spec-kit</span><br><span class="bi-desc">Framework de Spec-Driven Development</span></span><span class="bi-arrow">→</span></a>
+        <a class="bonus-item anim" style="--i:2" href="https://github.com/rtk-ai/rtk" target="_blank" rel="noopener"><span><span class="bi-title">rtk</span><br><span class="bi-desc">Token Saver — proxy de comandos otimizado</span></span><span class="bi-arrow">→</span></a>
+        <a class="bonus-item anim" style="--i:3" href="https://github.com/italomanzine/Harness-Engineering/blob/main/docs/prompt-refiner.md" target="_blank" rel="noopener"><span><span class="bi-title">Prompt Refiner</span><br><span class="bi-desc">Meta-prompt iterativo para criar prompts</span></span><span class="bi-arrow">→</span></a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Prism -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-gherkin.min.js"></script>
+<!-- QRCode -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+(function(){
+  const deck = document.getElementById('deck');
+  const sections = Array.from(document.querySelectorAll('#deck > section'));
+
+  /* ---------- DOTS NAV ---------- */
+  const dotsNav = document.getElementById('dots');
+  sections.forEach((sec, i) => {
+    const b = document.createElement('button');
+    b.title = sec.dataset.title || ('Slide ' + (i+1));
+    b.setAttribute('aria-label', b.title);
+    b.addEventListener('click', () => sec.scrollIntoView({behavior:'smooth'}));
+    dotsNav.appendChild(b);
+  });
+  const dots = Array.from(dotsNav.children);
+
+  /* ---------- REVEAL OBSERVER ---------- */
+  const revealEls = document.querySelectorAll('.anim,.anim-zoom,.anim-left,.anim-right');
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, {threshold:0.15});
+  revealEls.forEach(el => revealObs.observe(el));
+
+  /* ---------- TYPEWRITER ---------- */
+  function typeIn(codeEl){
+    if (codeEl.dataset.typed) return;
+    codeEl.dataset.typed = '1';
+    const raw = codeEl.getAttribute('data-code');
+    // decode HTML entities stored in attribute
+    const ta = document.createElement('textarea');
+    ta.innerHTML = raw;
+    const text = ta.value;
+    codeEl.textContent = '';
+    const cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    cursor.innerHTML = '&nbsp;';
+    codeEl.appendChild(cursor);
+    let i = 0;
+    (function step(){
+      if (i < text.length){
+        cursor.insertAdjacentText('beforebegin', text.charAt(i));
+        i++;
+        setTimeout(step, 25);
+      } else {
+        cursor.remove();
+        if (window.Prism) Prism.highlightElement(codeEl);
+      }
+    })();
+  }
+
+  /* ---------- ACTIVE DOT + TYPEWRITER TRIGGER ---------- */
+  const sectionObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting){
+        const idx = sections.indexOf(e.target);
+        dots.forEach((d,i) => d.classList.toggle('active', i === idx));
+        e.target.querySelectorAll('code[data-code]').forEach(typeIn);
+      }
+    });
+  }, {threshold:0.5});
+  sections.forEach(s => sectionObs.observe(s));
+
+  /* highlight static (non-typewriter) code blocks immediately */
+  if (window.Prism) {
+    document.querySelectorAll('pre code:not([data-code])').forEach(el => Prism.highlightElement(el));
+  }
+
+  /* ---------- KEYBOARD NAV ---------- */
+  function currentIndex(){
+    const mid = deck.scrollTop + deck.clientHeight/2;
+    let best = 0;
+    sections.forEach((s,i) => { if (s.offsetTop <= mid) best = i; });
+    return best;
+  }
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight','ArrowDown','PageDown'].includes(e.key)){
+      e.preventDefault();
+      sections[Math.min(currentIndex()+1, sections.length-1)].scrollIntoView({behavior:'smooth'});
+    } else if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){
+      e.preventDefault();
+      sections[Math.max(currentIndex()-1, 0)].scrollIntoView({behavior:'smooth'});
+    } else if (e.key === 'Home'){
+      e.preventDefault(); sections[0].scrollIntoView({behavior:'smooth'});
+    } else if (e.key === 'End'){
+      e.preventDefault(); sections[sections.length-1].scrollIntoView({behavior:'smooth'});
+    } else if (e.ctrlKey && e.altKey && (e.key === 'F5' || e.code === 'F5')){
+      /* modo apresentação full-screen */
+      e.preventDefault();
+      if (!document.fullscreenElement){
+        (document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen || (()=>{})).call(document.documentElement);
+      } else {
+        (document.exitFullscreen || document.webkitExitFullscreen || (()=>{})).call(document);
+      }
+    }
+  });
+  document.addEventListener('fullscreenchange', () => {
+    document.body.classList.toggle('presenting', !!document.fullscreenElement);
+  });
+
+  /* ---------- DIGITAL CIRCUIT (fundo global, atrás de todas as sections) ---------- */
+  const circuitBg = document.getElementById('circuit-bg');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  (function buildCircuit(){
+    const NS = 'http://www.w3.org/2000/svg';
+    const W = 1600, H = 900, grid = 40;
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+    // glow filter for traveling pulses
+    svg.innerHTML = '<defs><filter id="cglow" x="-60%" y="-60%" width="220%" height="220%">' +
+      '<feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
+    const frag = document.createDocumentFragment();
+    const snap = v => Math.round(v / grid) * grid;
+    // 8 directions ordered by angle → turns are smooth ±45° (PCB-style routing)
+    const D8 = [[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]];
+    const mk = (tag, cls) => { const e = document.createElementNS(NS, tag); if (cls) e.setAttribute('class', cls); return e; };
+
+    function via(x, y, r){
+      const pad = mk('circle', 'via'); pad.setAttribute('cx', x); pad.setAttribute('cy', y); pad.setAttribute('r', r); frag.appendChild(pad);
+      const core = mk('circle', 'via-core'); core.setAttribute('cx', x); core.setAttribute('cy', y); core.setAttribute('r', r * 0.45); frag.appendChild(core);
+    }
+    function route(){
+      let x = snap(Math.random() * W), y = snap(Math.random() * H);
+      let di = Math.floor(Math.random() * 8);
+      let d = 'M' + x + ',' + y;
+      const pts = [[x, y]];
+      const segs = 3 + Math.floor(Math.random() * 5);
+      for (let s = 0; s < segs; s++){
+        const r = Math.random();           // bias toward straight / gentle ±45° turns
+        if (r < 0.34) di = (di + 1) & 7; else if (r < 0.68) di = (di + 7) & 7;
+        else if (r < 0.82) di = (di + 2) & 7; else if (r < 0.9) di = (di + 6) & 7;
+        const dir = D8[di], len = grid * (1 + Math.floor(Math.random() * 3));
+        x = Math.max(0, Math.min(W, x + dir[0] * len));
+        y = Math.max(0, Math.min(H, y + dir[1] * len));
+        d += ' L' + x + ',' + y; pts.push([x, y]);
+      }
+      return { d, pts };
+    }
+
+    // traces (two depth layers) + vias; collect bright ones for the flowing light
+    const lit = [];
+    for (let t = 0; t < 46; t++){
+      const { d, pts } = route();
+      const cls = (t % 5 === 0) ? 't-dim' : 't-mid';
+      const path = mk('path', 'trace ' + cls); path.setAttribute('d', d); frag.appendChild(path);
+      via(pts[0][0], pts[0][1], 3.6);
+      via(pts[pts.length - 1][0], pts[pts.length - 1][1], 3.6);
+      if (t % 3 === 0 && pts.length > 3){ const m = pts[(pts.length / 2) | 0]; via(m[0], m[1], 3); }
+      if (cls === 't-mid' && Math.random() < 0.55) lit.push(d);
+    }
+
+    // traveling data pulses: a short bright dash glides along the trace
+    if (!reduced){
+      lit.slice(0, 16).forEach(d => {
+        const f = mk('path', 'flow');
+        f.setAttribute('d', d);
+        f.setAttribute('pathLength', '100');
+        f.setAttribute('stroke-dasharray', '7 93');
+        f.style.filter = 'url(#cglow)';
+        f.style.animation = 'flowMove ' + (2.5 + Math.random() * 3).toFixed(1) + 's linear infinite';
+        f.style.animationDelay = (Math.random() * 3).toFixed(1) + 's';
+        frag.appendChild(f);
+      });
+    }
+
+    svg.appendChild(frag);
+    circuitBg.appendChild(svg);
+  })();
+
+  /* ---------- QR CODES ---------- */
+  function makeQR(id, url){
+    const el = document.getElementById(id);
+    if (el && window.QRCode){
+      new QRCode(el, {text:url, width:148, height:148, colorDark:'#0a0a0f', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.M});
+    }
+  }
+  makeQR('qr-gh', 'https://github.com/italomanzine/Harness-Engineering');
+  makeQR('qr-li', 'https://linkedin.com/in/italomanzine');
+
+})();
+</script>
+</body>
+</html>
