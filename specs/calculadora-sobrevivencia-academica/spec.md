@@ -33,7 +33,9 @@ Nao deve haver implementacao de codigo durante `/refine`.
 - GitHub Project: https://github.com/users/italomanzine/projects/3/views/1
 - Produto alvo: `italomanzine/Alexandria-UFSC`
 - Stitch Project: https://stitch.withgoogle.com/projects/13111711788255953460?pli=1
+- Stitch node obrigatorio para implementacao: https://stitch.withgoogle.com/projects/13111711788255953460?node-id=6b8e98f1e5ad4c30b717b75f0671b922
 - Stitch MCP project: `projects/13111711788255953460`
+- Stitch MCP screen obrigatoria: `projects/13111711788255953460/screens/6b8e98f1e5ad4c30b717b75f0671b922`
 - Stitch local reference: `.stitch/SITE.md`
 - Stitch visual system: `.stitch/DESIGN.md`
 - Fonte UFSC PROGRAD: https://prograd.ufsc.br/faq-2/
@@ -48,7 +50,7 @@ Teste previo realizado em 2026-06-02:
 - `tools/list`: PASS, ferramentas disponiveis incluem `get_project`, `list_projects`, `list_screens`, `get_screen`, `upload_design_md`, `create_design_system`, `apply_design_system`.
 - `get_project` com `name=projects/13111711788255953460`: PASS, retornou projeto `Calculadora de Notas UFSC`, `TEXT_TO_UI_PRO`, `DESKTOP`, `PRIVATE`.
 - `list_screens` com `projectId=13111711788255953460`: PASS, retornou a tela principal `projects/13111711788255953460/screens/6b8e98f1e5ad4c30b717b75f0671b922`.
-- `get_screen` da tela principal: PASS, retornou `Calculadora de Notas UFSC com REC - Engenharia de Computacao`, screenshot e HTML.
+- `get_screen` da tela principal: PASS, retornou `Calculadora de Notas UFSC com REC - Engenharia de Computacao`, screenshot e HTML. Este e o no/tela que a US deve implementar: https://stitch.withgoogle.com/projects/13111711788255953460?node-id=6b8e98f1e5ad4c30b717b75f0671b922
 - Download do HTML da tela principal: PASS, confirmou componentes/rótulos como Alexandria UFSC, Grade Curricular, Projetos, Configuracoes, Historico, Simulador, Simulador de Notas, Dados da Disciplina, P1, P2, Adicionar Avaliacao, Simulacao de Recuperacao (REC), Nota da REC, Calcular Resultado, Media Parcial, Criterios UFSC, Aprovacao Direta e Aprovacao apos REC.
 
 Procedimento obrigatorio para `/intent`:
@@ -58,7 +60,7 @@ Procedimento obrigatorio para `/intent`:
 3. Executar `tools/list` e confirmar que `get_project`, `list_screens` e `get_screen` estao disponiveis.
 4. Executar `get_project` com `name=projects/13111711788255953460`.
 5. Executar `list_screens` com `projectId=13111711788255953460`.
-6. Executar `get_screen` para a screen `projects/13111711788255953460/screens/6b8e98f1e5ad4c30b717b75f0671b922`.
+6. Executar `get_screen` para a screen `projects/13111711788255953460/screens/6b8e98f1e5ad4c30b717b75f0671b922`, referente ao no Stitch https://stitch.withgoogle.com/projects/13111711788255953460?node-id=6b8e98f1e5ad4c30b717b75f0671b922 e a tela "Calculadora de Notas UFSC com REC - Engenharia de Computacao".
 7. Baixar/inspecionar o HTML ou screenshot retornado pela screen principal para conferir componentes antes de codificar.
 8. Registrar no `plan.md` os comandos/ferramentas usados e os componentes confirmados pelo MCP.
 9. Somente depois desse preflight MCP, iniciar a implementacao React / Next.js.
